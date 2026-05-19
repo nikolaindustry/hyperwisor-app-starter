@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Theme tokens are injected at runtime from app.config.ts by src/lib/theme.ts.
+   The values below are fallbacks so the app renders even before theme init. */
+:root {
+  --color-primary: #0066ff;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #00c2a8;
+  --color-background: #ffffff;
+  --color-surface: #f5f7fa;
+  --color-text: #0a0a0a;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --font-sans: Inter, system-ui, -apple-system, sans-serif;
+  --radius: 0.75rem;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* Native safe areas for Capacitor builds */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+input, button, textarea { font-family: inherit; }
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
