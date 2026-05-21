@@ -73,10 +73,36 @@ export type SensorReading = {
   recorded_at: string;
 };
 
-export type CommandPayload = {
-  command_id?: string;
-  action_id?: string;
-  parameters?: Record<string, string | number | boolean>;
+/**
+ * Hyperwisor device command protocol.
+ *
+ * Commands are sent over the realtime WebSocket as:
+ *   { targetId: "<deviceId>", payload: { commands: DeviceCommand[] } }
+ *
+ * This is the real wire format used by the platform — verified against
+ * deviceWebSocketService and the dashboard widget event vocabulary.
+ */
+export type CommandParams = Record<string, string | number | boolean>;
+
+export type DeviceAction = {
+  action: string;
+  params?: CommandParams;
+};
+
+export type DeviceCommand = {
+  command: string;
+  actions: DeviceAction[];
+};
+
+/** Incoming telemetry frame from the realtime relay. */
+export type RealtimeMessage = {
+  widgetId?: string;
+  device_id?: string;
+  sensor_name?: string;
+  value?: number | string | boolean;
+  unit?: string;
+  timestamp?: string;
+  [key: string]: unknown;
 };
 
 export type QrCodeData = {

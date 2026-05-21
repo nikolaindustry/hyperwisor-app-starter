@@ -29,14 +29,40 @@ to test the onboarding flow.
 
 1. Get your `mk_…` API key and `msk_…` secret key from the Hyperwisor
    manufacturer dashboard.
-2. Open [`app.config.ts`](./app.config.ts) and replace:
-   ```ts
-   apiKey: "DEMO",
-   secretKey: "DEMO",
+2. Copy `.env.example` to `.env.local` and fill in:
    ```
-   with your real values.
+   VITE_HW_API_KEY=mk_...
+   VITE_HW_SECRET_KEY=msk_...
+   ```
+   `.env.local` is git-ignored — your keys never get committed.
 3. Restart `npm run dev`. The mock banner disappears; auth and device APIs now
    hit the real backend.
+
+---
+
+## Build a product UI with an AI agent
+
+The standout feature: you don't lay out device UIs by hand. Open this repo in
+**Claude Code** (or any Claude-powered coding agent) and let it generate a
+clean, bespoke screen for each of your products.
+
+```bash
+npm run inspect                 # list your products
+npm run inspect <productId>     # write the product's spec to .hyperwisor/
+```
+
+Then tell the agent:
+
+> "Build the UI for product &lt;productId&gt;."
+
+The agent reads [`CLAUDE.md`](./CLAUDE.md) and the generated spec, then writes a
+tailored device screen into `src/screens/device/<product>/` and registers it.
+`npm run dev` → finished app. No canvas, no widget grid — real, editable,
+professionally-designed React code that you own.
+
+See [`CLAUDE.md`](./CLAUDE.md) for how generation works and
+[`src/screens/device/examples/SmartThermostatScreen.tsx`](./src/screens/device/examples/SmartThermostatScreen.tsx)
+for the quality bar.
 
 > ⚠ **Don't ship `secretKey` in production mobile binaries.**
 > See [`docs/SECURITY.md`](./docs/SECURITY.md) for the proxy-worker pattern.

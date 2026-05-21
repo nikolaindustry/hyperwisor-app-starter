@@ -41,6 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     else await storage.remove(STORAGE_KEY);
   }, []);
 
+  // Keep the realtime connection in sync with the signed-in user.
+  React.useEffect(() => {
+    const userId = session?.user?.id;
+    if (userId) sdk.connectRealtime(userId);
+    return () => sdk.disconnectRealtime();
+  }, [session?.user?.id]);
+
   const signIn = React.useCallback(
     async (email: string, password: string) => {
       const res = await sdk.signIn({ email, password });

@@ -10,12 +10,13 @@
 
 import { appConfig, isMockMode } from "@config";
 import { mock } from "./mock";
+import { realtime } from "./realtime";
 import type {
   Product,
   Session,
   UserDevice,
   SensorReading,
-  CommandPayload,
+  DeviceCommand,
 } from "./types";
 
 type RequestInitWithAuth = RequestInit & { authToken?: string };
@@ -75,7 +76,7 @@ export const sdk = {
   },
 
   // --- Onboarding ---
-  async scanQr(qrData: string): Promise<{ success: true; product: Product }> {
+  async scanQr(qrData: string): Promise<{ success: boolean; product: Product }> {
     if (isMockMode()) return mock.scanQr(qrData);
     return liveRequest("POST", "/onboarding/scan-qr", { qr_data: qrData });
   },
@@ -84,12 +85,12 @@ export const sdk = {
     product_id: string;
     device_name: string;
     device_identifier?: string;
-  }): Promise<{ success: true; device: UserDevice }> {
+  }): Promise<{ success: boolean; device: UserDevice }> {
     if (isMockMode()) return mock.onboardDevice(input);
     return liveRequest("POST", "/onboarding/device", input);
   },
   async getUserDevices(userId: string): Promise<{
-    success: true;
+    success: boolean;
     devices: UserDevice[];
     count: number;
   }> {
@@ -105,12 +106,17 @@ export const sdk = {
   },
 
   // --- Commands & telemetry ---
-  async sendCommand(deviceId: string, payload: CommandPayload) {
-    if (isMockMode()) return mock.sendCommand(deviceId, payload);
-    return liveRequest("POST", "/commands/send", {
-      device_id: deviceId,
-      command_payload: payload,
-    });
+  /**
+   * Send commands to a device. `commands` uses the real Hyperwisor
+   * protocol — see DeviceCommand in types.ts. Example:
+   *   sdk.sendCommand(deviceId, [
+   *     { command: "setPower", actions: [{ action: "turnOn", params: { outletId: "0" } }] }
+   *   ]);
+   */
+  async sendCommand(deviceId: string, commands: DeviceCommand[], widgetId?: string) {
+    if (isMockMode()) return mock.sendCommand(deviceId, commands);
+    realtime.sendCommand(deviceId, commands, widgetId);
+    return { success: true, device_id: deviceId, timestamp: new Date().toISOString() };
   },
   async getSensorData(deviceId: string): Promise<{ success: true; data: SensorReading[] }> {
     if (isMockMode()) return mock.getSensorData(deviceId);
@@ -122,6 +128,18 @@ export const sdk = {
   },
 
   // --- Realtime ---
+  /** Open/refresh the realtime connection for a user. Called by AuthProvider. */
+  connectRealtime(userId: string) {
+    if (!isMockMode()) realtime.connect(userId);
+  },
+  disconnectRealtime() {
+    if (!isMockMode()) realtime.disconnect();
+  },
+
+  /**
+   * Subscribe to telemetry for one device. The handler fires whenever a
+   * frame for `deviceId` arrives. Returns an unsubscribe function.
+   */
   subscribeTelemetry(
     deviceId: string,
     userId: string,
@@ -129,24 +147,18 @@ export const sdk = {
   ): () => void {
     if (isMockMode()) return mock.subscribeTelemetry(deviceId, onMessage);
 
-    const ws = new WebSocket(`${appConfig.realtimeUrl}/?id=${encodeURIComponent(userId)}`);
-    ws.onmessage = (event) => {
-      try {
-        const msg = JSON.parse(event.data);
-        // Platform broadcasts in various shapes. We accept any with device_id matching.
-        if (msg?.device_id === deviceId && typeof msg?.value !== "undefined") {
-          onMessage({
-            device_id: deviceId,
-            sensor_name: msg.sensor_name ?? "value",
-            value: Number(msg.value),
-            unit: msg.unit,
-            recorded_at: msg.timestamp ?? new Date().toISOString(),
-          });
-        }
-      } catch {
-        /* ignore malformed frames */
+    realtime.connect(userId);
+    return realtime.onMessage((msg) => {
+      // Accept frames addressed to this device with a numeric value.
+      if (msg?.device_id === deviceId && msg.value !== undefined) {
+        onMessage({
+          device_id: deviceId,
+          sensor_name: msg.sensor_name ?? "value",
+          value: Number(msg.value),
+          unit: msg.unit,
+          recorded_at: msg.timestamp ?? new Date().toISOString(),
+        });
       }
-    };
-    return () => ws.close();
+    });
   },
 };

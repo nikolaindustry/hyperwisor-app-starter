@@ -2,6 +2,7 @@ node_modules
 dist
 dist-ssr
 *.local
+*.tsbuildinfo
 
 # Editor
 .vscode/*
@@ -25,3 +26,6 @@ ios/App/build/
 .env
 .env.local
 .env.*.local
+
+# Product specs written by `npm run inspect` (may contain account data)
+.hyperwisor/

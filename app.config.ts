@@ -33,15 +33,21 @@ export const appConfig = {
   productId: null as string | null, // required if mode === "single-product"
 
   // --- Credentials ------------------------------------------------
-  // Get these from the Hyperwisor manufacturer dashboard.
-  // Leave as "DEMO" / "DEMO" to run in MOCK MODE.
+  // Credentials are read from environment variables (see .env.example).
+  // Copy .env.example to .env.local and fill in your real keys.
+  // If VITE_HW_API_KEY is unset, the app runs in MOCK MODE.
   //
+  // NEVER hard-code real keys here — this file is committed to git.
   // SECURITY: do NOT ship `secretKey` in production mobile binaries.
   // See docs/SECURITY.md for the proxy-worker pattern.
-  apiKey: "DEMO",
-  secretKey: "DEMO",
-  apiBaseUrl: "https://cgsuxlbravclbbpnvfky.supabase.co/functions/v1",
-  realtimeUrl: "wss://nikolaindustry-realtime.onrender.com",
+  apiKey: import.meta.env.VITE_HW_API_KEY || "DEMO",
+  secretKey: import.meta.env.VITE_HW_SECRET_KEY || "DEMO",
+  apiBaseUrl:
+    import.meta.env.VITE_HW_API_BASE_URL ||
+    "https://cgsuxlbravclbbpnvfky.supabase.co/functions/v1",
+  realtimeUrl:
+    import.meta.env.VITE_HW_REALTIME_URL ||
+    "wss://nikolaindustry-realtime.onrender.com",
 
   // --- Theme ------------------------------------------------------
   // Values are piped to Tailwind via CSS variables. See src/index.css.

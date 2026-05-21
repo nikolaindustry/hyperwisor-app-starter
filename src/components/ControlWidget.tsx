@@ -30,11 +30,12 @@ export function ControlWidget({
     if (!action || !param) return;
     setBusy(true);
     try {
-      await sdk.sendCommand(deviceId, {
-        command_id: command.id,
-        action_id: action.id,
-        parameters: { [param.name]: next },
-      });
+      await sdk.sendCommand(deviceId, [
+        {
+          command: command.command_name,
+          actions: [{ action: action.action_name, params: { [param.name]: next } }],
+        },
+      ]);
       setValue(next);
     } catch (err) {
       toast.push((err as Error).message || "Command failed", "danger");
