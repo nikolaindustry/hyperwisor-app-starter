@@ -11,6 +11,7 @@ export { Section } from "./Section";
 export { StatusHeader } from "./StatusHeader";
 export { MetricTile, MetricGrid } from "./MetricTile";
 export { ToggleTile } from "./ToggleTile";
+export { HoldButton } from "./HoldButton";
 export { StepperControl } from "./StepperControl";
 
 // Re-export the lower-level primitives so a screen needs one import.

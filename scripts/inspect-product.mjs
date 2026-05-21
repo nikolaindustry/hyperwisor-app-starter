@@ -76,21 +76,40 @@ async function api(path) {
  * Command wire format (sent over WebSocket to the device):
  *   { targetId, payload: { commands: [{ command, actions: [{action, params}] }] } }
  */
-function extractCapabilities(dashboardConfig) {
-  const commands = {}; // command -> { actions: { action -> paramSamples } }
-  const dataBindings = []; // display widgets that read telemetry
+const DISPLAY_TYPES = ["gauge", "status", "chart", "label", "heatmap", "compass", "attitude"];
+const DECORATIVE_TYPES = ["image", "svg", "rectangle", "ellipse", "triangle", "line", "arrow"];
 
-  if (!dashboardConfig?.pages) return { commands, dataBindings };
+function extractCapabilities(dashboardConfig) {
+  // Raw command vocabulary (deduped) — the low-level reference.
+  const commands = {};
+  // Manufacturer-authored controls — title + type + intent. THIS is the
+  // good context: the manufacturer's own labels and chosen affordances.
+  const controls = [];
+  // Display widgets — what telemetry the UI shows, with the chosen titles.
+  const displays = [];
+  let decorativeCount = 0;
+
+  if (!dashboardConfig?.pages) {
+    return { commands, controls, displays, theme: null, decorativeCount };
+  }
 
   for (const page of dashboardConfig.pages) {
     for (const widget of page.widgets || []) {
       const cfg = widget.config || {};
-
-      // Control vocabulary from widget events
       const events = cfg.widgetEvents || [];
-      for (const ev of events) {
-        for (const target of ev.targets || []) {
-          for (const cmd of target.payload?.commands || []) {
+
+      // Per-widget control: pair the manufacturer's title + widget type
+      // with the command payload for each UI event (on/off/push/release…).
+      if (events.length > 0) {
+        const eventMap = {};
+        for (const ev of events) {
+          const cmds = (ev.targets || []).flatMap(
+            (t) => t.payload?.commands || [],
+          );
+          if (cmds.length) eventMap[ev.eventType] = cmds;
+
+          // also fold into the raw vocabulary
+          for (const cmd of cmds) {
             const cName = cmd.command || "unknown";
             commands[cName] ||= { actions: {} };
             for (const act of cmd.actions || []) {
@@ -103,21 +122,34 @@ function extractCapabilities(dashboardConfig) {
             }
           }
         }
-      }
-
-      // Display widgets — note what telemetry they read
-      if (["gauge", "status", "chart", "label", "heatmap"].includes(widget.type)) {
-        dataBindings.push({
-          widgetType: widget.type,
-          title: widget.title,
-          dataSource: cfg.dataSource || null,
-          websocketTopic: cfg.websocketTopic || null,
-          unit: cfg.unit || cfg.suffix || null,
+        controls.push({
+          title: (widget.title || "").trim() || "(untitled)",
+          widgetType: widget.type, // switch=latching, button=momentary, slider, joystick…
+          events: eventMap,
         });
       }
+
+      // Display widgets — telemetry the manufacturer chose to surface.
+      if (DISPLAY_TYPES.includes(widget.type)) {
+        displays.push({
+          title: (widget.title || "").trim() || "(untitled)",
+          widgetType: widget.type,
+          unit: (cfg.unit || cfg.suffix || "").trim() || null,
+          dataSource: cfg.dataSource || null,
+        });
+      }
+
+      if (DECORATIVE_TYPES.includes(widget.type)) decorativeCount += 1;
     }
   }
-  return { commands, dataBindings };
+
+  return {
+    commands,
+    controls,
+    displays,
+    theme: dashboardConfig.theme || null,
+    decorativeCount,
+  };
 }
 
 // --- Main --------------------------------------------------------------
@@ -156,7 +188,7 @@ async function inspectProduct(id) {
     generatedAt: new Date().toISOString(),
     product,
     commandsApi: [],
-    capabilities: { commands: {}, dataBindings: [] },
+    capabilities: { commands: {}, controls: [], displays: [], theme: null },
     dashboard: null,
     sensorSample: [],
     notes: [],
@@ -179,8 +211,11 @@ async function inspectProduct(id) {
     spec.dashboard = dashboard;
     if (dashboard?.dashboard_config) {
       spec.capabilities = extractCapabilities(dashboard.dashboard_config);
-      const cmdCount = Object.keys(spec.capabilities.commands).length;
-      console.log(`  ✓ capabilities        (${cmdCount} commands mined from dashboard)`);
+      const c = spec.capabilities;
+      console.log(
+        `  ✓ capabilities        (${c.controls.length} controls, ` +
+          `${c.displays.length} displays mined from dashboard)`,
+      );
     } else {
       console.log(`  · dashboard           (none — capabilities unknown)`);
       spec.notes.push(

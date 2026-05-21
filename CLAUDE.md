@@ -46,11 +46,32 @@ npm run inspect <productId>
 ```
 Read `.hyperwisor/product-<id>.json`. It contains:
 - `product` — name, category, model, description
-- `capabilities.commands` — the **real command vocabulary** mined from the
-  product's dashboard config: `{ commandName: { actions: { actionName: { paramSamples } } } }`
-- `capabilities.dataBindings` — telemetry the product reports
+- `commandsApi` — raw command/action list from the API
+- `capabilities.controls` — **the most important field.** The manufacturer's
+  own dashboard controls: each has a `title` (their real label), a
+  `widgetType` (their intended affordance), and an `events` map of UI
+  event → command payload. Use these titles and types verbatim — they are
+  the manufacturer's intent. Do NOT invent your own labels.
+- `capabilities.displays` — telemetry the manufacturer surfaces, with their
+  chosen `title` and `unit`.
+- `capabilities.commands` — raw deduped command vocabulary (low-level reference).
+- `capabilities.theme` — the manufacturer's dashboard colors.
 - `sensorSample` — real telemetry readings (shape + units)
 - `notes` — gaps to ask the manufacturer about
+
+**`controls` vs `commandsApi`:** the API lists every command the firmware
+*can* accept; `controls` lists what the manufacturer actually *put in their
+UI*. Follow `controls` — if the API has Relay 3 & 4 but the dashboard only
+uses 1 & 2, build 1 & 2. Mention the rest to the manufacturer rather than
+guessing.
+
+**widgetType → affordance** (build the matching control):
+- `switch` → latching on/off (`ToggleTile`)
+- `button` → momentary press (`HoldButton`) — fires on press, reverts on release
+- `slider` → numeric range; `gauge`/`label`/`status` → read-only display
+- `joystick`, `color-picker`, etc. → match the obvious control
+- `payment-action` → a paid unlock; the starter has no payment layer —
+  note it to the manufacturer, don't implement it
 
 ### Step 2 — Ask, don't guess
 If the spec is thin (no capabilities, empty notes flagged), **ask the

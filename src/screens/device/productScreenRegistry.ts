@@ -1,5 +1,7 @@
 import type { DeviceScreen } from "./types";
 import { SmartThermostatScreen } from "./examples/SmartThermostatScreen";
+import { SmartBikeScreen } from "./smart-bike/SmartBikeScreen";
+import { GangSwitchScreen } from "./gang-switch/GangSwitchScreen";
 
 /**
  * Maps a product id → its bespoke device screen.
@@ -25,6 +27,10 @@ import { SmartThermostatScreen } from "./examples/SmartThermostatScreen";
  */
 export const productScreens: Record<string, DeviceScreen> = {
   "demo-product-001": SmartThermostatScreen,
+  // Smart Bike
+  "2935cd69-302d-42f0-8708-3bd909ffc647": SmartBikeScreen,
+  // 5ch_gang_with_1_fan
+  "4fb8f51a-0f84-4cae-9060-27d8949360e2": GangSwitchScreen,
 };
 
 export function getDeviceScreen(productId: string): DeviceScreen | null {
