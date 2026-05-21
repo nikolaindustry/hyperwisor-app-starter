@@ -2,24 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Theme tokens are injected at runtime from app.config.ts by src/lib/theme.ts.
-   The values below are fallbacks so the app renders even before theme init. */
+/* Theme tokens are injected at runtime from app.config.ts by the
+   ThemeProvider. The values below are light-mode fallbacks for the very
+   first paint (main.tsx applies the real theme before React renders). */
 :root {
-  --color-primary: #0066ff;
+  --color-primary: #2563eb;
   --color-primary-foreground: #ffffff;
-  --color-accent: #00c2a8;
-  --color-background: #ffffff;
-  --color-surface: #f5f7fa;
-  --color-text: #0a0a0a;
-  --color-muted: #6b7280;
-  --color-border: #e5e7eb;
-  --color-success: #10b981;
-  --color-danger: #ef4444;
+  --color-accent: #0d9488;
+  --color-background: #fbfbfc;
+  --color-card: #ffffff;
+  --color-surface: #f4f4f5;
+  --color-text: #18181b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
   --font-sans: Inter, system-ui, -apple-system, sans-serif;
-  --radius: 0.75rem;
+  --radius: 0.875rem;
 }
 
-html, body, #root { height: 100%; }
+/* Elevation scale — soft shadows in light, near-flat (borders carry it)
+   in dark, which is how clean/minimal dark UIs read best. */
+:root[data-theme="light"] {
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 14px -3px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 16px 40px -12px rgb(0 0 0 / 0.16);
+}
+:root[data-theme="dark"] {
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 6px 20px -6px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 20px 48px -12px rgb(0 0 0 / 0.7);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
 
 body {
   margin: 0;
@@ -27,14 +50,47 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+#root {
   /* Native safe areas for Capacitor builds */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-input, button, textarea { font-family: inherit; }
+input,
+button,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* Smooth, consistent theme transitions */
+body,
+[data-theme] * {
+  transition: background-color 0.18s ease, border-color 0.18s ease,
+    color 0.18s ease;
+}
 
 @layer utilities {
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Respect users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    [data-theme] * {
+      transition: none !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
 }

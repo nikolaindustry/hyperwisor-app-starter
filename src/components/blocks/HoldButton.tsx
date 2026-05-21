@@ -47,17 +47,20 @@ export function HoldButton({
       onPointerLeave={release}
       onPointerCancel={release}
       className={cn(
-        "w-full text-left rounded border p-4 flex items-center gap-3 transition select-none touch-none disabled:opacity-50",
+        "w-full text-left rounded-lg border shadow-sm p-3.5 flex items-center gap-3",
+        "transition-[background-color,border-color,transform] duration-100 select-none touch-none",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+        "disabled:opacity-50 disabled:pointer-events-none",
         held
-          ? "border-primary bg-primary/10 scale-[0.99]"
-          : "border-border bg-surface hover:bg-border/30",
+          ? "border-primary bg-primary/10 scale-[0.985]"
+          : "border-border bg-card hover:bg-surface",
       )}
     >
       {icon ? (
         <div
           className={cn(
-            "w-10 h-10 rounded flex items-center justify-center shrink-0 transition",
-            held ? "bg-primary text-primary-foreground" : "bg-border/60 text-muted",
+            "w-10 h-10 rounded-md flex items-center justify-center shrink-0 transition-colors",
+            held ? "bg-primary text-primary-foreground" : "bg-surface text-muted",
           )}
         >
           {icon}
@@ -65,7 +68,12 @@ export function HoldButton({
       ) : null}
       <div className="flex-1 min-w-0">
         <div className="font-medium text-sm truncate">{label}</div>
-        <div className="text-xs text-muted truncate">
+        <div
+          className={cn(
+            "text-xs truncate mt-0.5",
+            held ? "text-primary font-medium" : "text-muted",
+          )}
+        >
           {held ? "Active — release to stop" : description ?? "Press and hold"}
         </div>
       </div>

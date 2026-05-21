@@ -1,8 +1,10 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
+import { AuthShell } from "@/components/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Field } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
 
 export function ForgotPasswordScreen() {
@@ -27,27 +29,30 @@ export function ForgotPasswordScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-6">
-      <h1 className="text-2xl font-semibold mt-8">Reset password</h1>
-      <p className="text-muted mt-1 mb-6">
-        Enter your email and we'll send you a reset link.
-      </p>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <label className="text-sm font-medium">Email</label>
-        <Input
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <Button type="submit" size="lg" loading={loading} className="mt-4">
-          Send reset email
+    <AuthShell
+      title="Reset password"
+      subtitle="We'll email you a link to set a new password."
+      footer={
+        <Link to="/signin" className="text-primary font-medium">
+          Back to sign in
+        </Link>
+      }
+    >
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Field label="Email">
+          <Input
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Field>
+        <Button type="submit" size="lg" loading={loading} className="mt-2">
+          Send reset link
         </Button>
       </form>
-      <Link to="/signin" className="text-sm text-primary text-center mt-auto pb-4">
-        Back to sign in
-      </Link>
-    </div>
+    </AuthShell>
   );
 }

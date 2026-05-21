@@ -10,44 +10,43 @@ export function DeviceSettingsScreen() {
 
   if (!device) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen flex flex-col bg-background">
         <AppHeader title="Settings" showBack />
-        <div className="p-6 text-muted">Device not found.</div>
+        <div className="p-8 text-center text-muted text-sm">Device not found.</div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <AppHeader title="Settings" showBack />
-      <main className="flex-1 p-4 flex flex-col gap-3">
-        <Card>
-          <Row label="Name" value={device.device_name} />
-          <Row label="Product" value={device.iot_products?.product_name ?? "—"} />
-          <Row label="Model" value={device.iot_products?.model_number ?? "—"} />
-          <Row label="Firmware" value={device.iot_products?.firmware_version ?? "—"} />
-          <Row label="Device ID" value={device.device_identifier ?? "—"} />
-          <Row
-            label="Added"
-            value={new Date(device.created_at).toLocaleDateString()}
-            last
-          />
-        </Card>
-      </main>
-    </div>
-  );
-}
+  const rows: [string, string][] = [
+    ["Name", device.device_name],
+    ["Product", device.iot_products?.product_name ?? "—"],
+    ["Model", device.iot_products?.model_number ?? "—"],
+    ["Firmware", device.iot_products?.firmware_version ?? "—"],
+    ["Device ID", device.device_identifier ?? "—"],
+    ["Added", new Date(device.created_at).toLocaleDateString()],
+  ];
 
-function Row({ label, value, last }: { label: string; value: string; last?: boolean }) {
   return (
-    <div
-      className={
-        "flex justify-between py-3 " +
-        (last ? "" : "border-b border-border")
-      }
-    >
-      <span className="text-sm text-muted">{label}</span>
-      <span className="text-sm font-medium truncate ml-4">{value}</span>
+    <div className="min-h-screen flex flex-col bg-background">
+      <AppHeader title="Device settings" showBack />
+      <div className="flex-1 p-4">
+        <Card flush>
+          {rows.map(([label, value], i) => (
+            <div
+              key={label}
+              className={
+                "flex items-center justify-between gap-4 px-4 py-3.5 " +
+                (i < rows.length - 1 ? "border-b border-border" : "")
+              }
+            >
+              <span className="text-sm text-muted shrink-0">{label}</span>
+              <span className="text-sm font-medium text-right truncate">
+                {value}
+              </span>
+            </div>
+          ))}
+        </Card>
+      </div>
     </div>
   );
 }

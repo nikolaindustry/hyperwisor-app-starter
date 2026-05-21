@@ -1,8 +1,10 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
+import { AuthShell } from "@/components/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Field } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
 import { isMockMode } from "@config";
 
@@ -28,37 +30,49 @@ export function SignInScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-6">
-      <h1 className="text-2xl font-semibold mt-8">Welcome back</h1>
-      <p className="text-muted mt-1 mb-6">Sign in to manage your devices.</p>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <label className="text-sm font-medium">Email</label>
-        <Input
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label className="text-sm font-medium mt-2">Password</label>
-        <Input
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <Link to="/forgot-password" className="text-sm text-primary self-end mt-1">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to manage your devices."
+      footer={
+        <>
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-primary font-medium">
+            Create one
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Field label="Email">
+          <Input
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="Password">
+          <Input
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Field>
+        <Link
+          to="/forgot-password"
+          className="text-[13px] text-primary font-medium self-end -mt-1"
+        >
           Forgot password?
         </Link>
-        <Button type="submit" size="lg" loading={loading} className="mt-4">
+        <Button type="submit" size="lg" loading={loading} className="mt-2">
           Sign in
         </Button>
       </form>
-      <p className="text-sm text-muted text-center mt-auto pb-4">
-        Don't have an account?{" "}
-        <Link to="/signup" className="text-primary font-medium">Create one</Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

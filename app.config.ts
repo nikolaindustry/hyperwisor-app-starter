@@ -50,21 +50,43 @@ export const appConfig = {
     "wss://nikolaindustry-realtime.onrender.com",
 
   // --- Theme ------------------------------------------------------
-  // Values are piped to Tailwind via CSS variables. See src/index.css.
-  colors: {
-    primary: "#0066FF",
-    primaryForeground: "#FFFFFF",
-    accent: "#00C2A8",
-    background: "#FFFFFF",
-    surface: "#F5F7FA",
-    text: "#0A0A0A",
-    muted: "#6B7280",
-    border: "#E5E7EB",
-    success: "#10B981",
-    danger: "#EF4444",
+  // Light + dark palettes, piped to Tailwind via CSS variables.
+  // `defaultThemeMode` is the initial mode; "system" follows the OS and
+  // the user can override it from the Account screen.
+  //
+  // Most manufacturers only change `primary` (and maybe `accent`) in both
+  // palettes — the neutrals are tuned for a clean, professional look.
+  defaultThemeMode: "system" as "light" | "dark" | "system",
+  theme: {
+    light: {
+      primary: "#2563EB",
+      primaryForeground: "#FFFFFF",
+      accent: "#0D9488",
+      background: "#FBFBFC", // app background
+      card: "#FFFFFF", // panels / cards
+      surface: "#F4F4F5", // subtle fills: chips, icon wells, secondary buttons
+      text: "#18181B",
+      muted: "#71717A", // secondary text
+      border: "#E4E4E7", // hairline
+      success: "#16A34A",
+      danger: "#DC2626",
+    },
+    dark: {
+      primary: "#3B82F6",
+      primaryForeground: "#FFFFFF",
+      accent: "#2DD4BF",
+      background: "#09090B",
+      card: "#131316",
+      surface: "#1F1F23",
+      text: "#FAFAFA",
+      muted: "#A1A1AA",
+      border: "#27272A",
+      success: "#22C55E",
+      danger: "#F87171",
+    },
   },
   font: "Inter, system-ui, -apple-system, sans-serif",
-  borderRadius: "0.75rem",
+  borderRadius: "0.875rem",
 
   // --- Feature flags ----------------------------------------------
   features: {

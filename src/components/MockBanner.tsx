@@ -3,9 +3,9 @@ import { isMockMode } from "@config";
 export function MockBanner() {
   if (!isMockMode()) return null;
   return (
-    <div className="bg-accent/15 border-b border-accent/30 text-xs text-foreground px-4 py-2 text-center">
-      Running in <strong>mock mode</strong>. Set <code>apiKey</code> in
-      {" "}<code>app.config.ts</code> to go live.
+    <div className="bg-accent/10 border-b border-accent/20 text-[11px] text-foreground px-4 py-1.5 text-center font-medium">
+      Demo mode — set <code className="text-accent">VITE_HW_API_KEY</code> in{" "}
+      <code className="text-accent">.env.local</code> to go live
     </div>
   );
 }

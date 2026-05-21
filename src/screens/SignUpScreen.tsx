@@ -1,8 +1,10 @@
 import * as React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/auth/AuthProvider";
+import { AuthShell } from "@/components/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Field } from "@/components/ui/Field";
 import { useToast } from "@/components/ui/Toast";
 
 export function SignUpScreen() {
@@ -32,37 +34,52 @@ export function SignUpScreen() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-6">
-      <h1 className="text-2xl font-semibold mt-8">Create your account</h1>
-      <p className="text-muted mt-1 mb-6">Takes about a minute.</p>
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <label className="text-sm font-medium">Name</label>
-        <Input value={name} onChange={(e) => setName(e.target.value)} required />
-        <label className="text-sm font-medium mt-2">Email</label>
-        <Input
-          type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label className="text-sm font-medium mt-2">Password</label>
-        <Input
-          type="password"
-          autoComplete="new-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <p className="text-xs text-muted">Use at least 8 characters.</p>
-        <Button type="submit" size="lg" loading={loading} className="mt-4">
+    <AuthShell
+      title="Create account"
+      subtitle="It only takes a minute."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link to="/signin" className="text-primary font-medium">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Field label="Name">
+          <Input
+            autoComplete="name"
+            placeholder="Jordan Lee"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="Email">
+          <Input
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Field>
+        <Field label="Password" hint="Use at least 8 characters.">
+          <Input
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Field>
+        <Button type="submit" size="lg" loading={loading} className="mt-2">
           Create account
         </Button>
       </form>
-      <p className="text-sm text-muted text-center mt-auto pb-4">
-        Already have an account?{" "}
-        <Link to="/signin" className="text-primary font-medium">Sign in</Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

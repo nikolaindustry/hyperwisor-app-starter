@@ -1,11 +1,20 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Remove the default padding (for full-bleed content). */
+  flush?: boolean;
+}
+
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, flush, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("rounded border border-border bg-surface p-4", className)}
+      className={cn(
+        "rounded-lg border border-border bg-card shadow-sm",
+        flush ? "" : "p-4",
+        className,
+      )}
       {...props}
     />
   ),
