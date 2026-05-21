@@ -1,16 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Settings } from "lucide-react";
+import { LayoutDashboard, Settings, Terminal } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ControlWidget } from "@/components/ControlWidget";
-import { TelemetryChart } from "@/components/TelemetryChart";
 import { StatusHeader } from "@/components/blocks/StatusHeader";
-import { MetricTile } from "@/components/blocks/MetricTile";
 import { useDevices, useRemoveDevice } from "@/hooks/useDevices";
-import { useDeviceTelemetry } from "@/hooks/useDeviceTelemetry";
 import { useToast } from "@/components/ui/Toast";
-import { formatTimeAgo } from "@/lib/utils";
 import { getDeviceScreen } from "@/screens/device/productScreenRegistry";
 import type { UserDevice } from "@/lib/types";
 
@@ -40,7 +35,7 @@ export function DeviceDetailScreen() {
     );
   }
 
-  // Bespoke, AI-generated screen for this product — or the generic fallback.
+  // Bespoke, AI-generated screen for this product — or a clear empty state.
   const BespokeScreen = getDeviceScreen(device.product_id);
 
   async function onRemove() {
@@ -58,7 +53,7 @@ export function DeviceDetailScreen() {
     <div className="min-h-screen flex flex-col">
       <AppHeader title={device.device_name} showBack />
       <main className="flex-1">
-        {BespokeScreen ? <BespokeScreen device={device} /> : <GenericDeviceView device={device} />}
+        {BespokeScreen ? <BespokeScreen device={device} /> : <NoDashboardView device={device} />}
 
         {/* App-level footer — always present regardless of screen type */}
         <div className="p-4 flex flex-col gap-3 pb-8">
@@ -84,15 +79,11 @@ export function DeviceDetailScreen() {
 }
 
 /**
- * Generic fallback shown when a product has no bespoke screen yet.
- * Renders telemetry + the product's declared commands as plain controls.
- * Run `npm run inspect <productId>` then ask the AI agent to replace this.
+ * Shown when a product has no bespoke screen registered. A clear empty
+ * state — NOT a generic telemetry view that could be mistaken for a real
+ * product UI. The dev hint tells the manufacturer how to generate one.
  */
-function GenericDeviceView({ device }: { device: UserDevice }) {
-  const telemetry = useDeviceTelemetry(device.id);
-  const commands = device.iot_products?.product_commands ?? [];
-  const latest = telemetry.live ?? telemetry.history[telemetry.history.length - 1];
-
+function NoDashboardView({ device }: { device: UserDevice }) {
   return (
     <div className="p-4 flex flex-col gap-4">
       <StatusHeader
@@ -102,41 +93,36 @@ function GenericDeviceView({ device }: { device: UserDevice }) {
         lastSeen={device.last_seen}
       />
 
-      {latest ? (
-        <MetricTile
-          size="hero"
-          label={latest.sensor_name}
-          value={latest.value.toFixed(1)}
-          unit={latest.unit ?? ""}
-          hint={`Updated ${formatTimeAgo(latest.recorded_at)}`}
-        />
-      ) : null}
-
-      <div>
-        <h2 className="text-sm font-medium mb-2">Last 24 hours</h2>
-        <Card>
-          <TelemetryChart data={telemetry.history} />
-        </Card>
+      <div className="flex flex-col items-center text-center mt-10 gap-3">
+        <div className="w-20 h-20 rounded-full bg-surface flex items-center justify-center">
+          <LayoutDashboard size={36} className="text-muted" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-lg">No dashboard yet</h2>
+          <p className="text-muted text-sm mt-1 max-w-xs">
+            A screen for this product hasn't been built yet.
+          </p>
+        </div>
       </div>
 
-      {commands.length > 0 ? (
-        <div>
-          <h2 className="text-sm font-medium mb-2">Controls</h2>
-          <div className="flex flex-col gap-2">
-            {commands.map((cmd) => (
-              <ControlWidget key={cmd.id} deviceId={device.id} command={cmd} />
-            ))}
+      {/* Developer hint — how to generate this product's screen. */}
+      <Card className="mt-6">
+        <div className="flex items-start gap-2">
+          <Terminal size={15} className="text-muted mt-0.5 shrink-0" />
+          <div className="text-xs text-muted">
+            <span className="font-medium text-foreground">For the developer:</span>{" "}
+            run{" "}
+            <code className="bg-background px-1 py-0.5 rounded border border-border">
+              npm run inspect {device.product_id}
+            </code>{" "}
+            and ask your AI agent to build this product's screen. See{" "}
+            <code className="bg-background px-1 py-0.5 rounded border border-border">
+              CLAUDE.md
+            </code>
+            .
           </div>
         </div>
-      ) : (
-        <Card>
-          <div className="text-sm text-muted text-center py-3">
-            No bespoke screen for this product yet. Run{" "}
-            <code>npm run inspect {device.product_id}</code> and ask your AI
-            agent to build one.
-          </div>
-        </Card>
-      )}
+      </Card>
     </div>
   );
 }

@@ -111,6 +111,28 @@ let mockDevices: UserDevice[] = [
     created_at: new Date(Date.now() - 86_400_000 * 7).toISOString(),
     iot_products: DEMO_PRODUCT,
   },
+  {
+    // A device whose product has NO bespoke screen registered — shows the
+    // "No dashboard yet" state, so the starter demonstrates both paths.
+    id: "device-003",
+    user_id: "demo-user",
+    product_id: "demo-air-quality-002",
+    device_name: "Hallway Air Monitor",
+    device_identifier: "AQ-X1Y2Z3",
+    is_active: true,
+    is_online: true,
+    last_seen: new Date().toISOString(),
+    created_at: new Date(Date.now() - 86_400_000).toISOString(),
+    iot_products: {
+      id: "demo-air-quality-002",
+      product_name: "Air Quality Monitor",
+      product_category: "smart_home",
+      product_description: "Indoor air quality sensor",
+      model_number: "AQ-100",
+      firmware_version: "1.0.0",
+      is_public: true,
+    },
+  },
 ];
 
 function delay<T>(value: T, ms = 350): Promise<T> {
