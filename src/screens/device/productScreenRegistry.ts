@@ -2,6 +2,7 @@ import type { DeviceScreen } from "./types";
 import { SmartThermostatScreen } from "./examples/SmartThermostatScreen";
 import { SmartBikeScreen } from "./smart-bike/SmartBikeScreen";
 import { GangSwitchScreen } from "./gang-switch/GangSwitchScreen";
+import { SmartDualSocketPlugScreen } from "./smart-dual-socket-plug/SmartDualSocketPlugScreen";
 
 /**
  * Maps a product id → its bespoke device screen.
@@ -31,6 +32,8 @@ export const productScreens: Record<string, DeviceScreen> = {
   "2935cd69-302d-42f0-8708-3bd909ffc647": SmartBikeScreen,
   // 5ch_gang_with_1_fan
   "4fb8f51a-0f84-4cae-9060-27d8949360e2": GangSwitchScreen,
+  // Smart Dual-Socket Plug (SDP-2000)
+  "232d1168-8ba2-4aa4-a50d-c87dd332e8a4": SmartDualSocketPlugScreen,
 };
 
 export function getDeviceScreen(productId: string): DeviceScreen | null {

@@ -43,11 +43,12 @@ const ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY
 const HW_KEY = env.VITE_HW_API_KEY || process.env.VITE_HW_API_KEY;
 
 if (!ANTHROPIC_API_KEY) {
-  console.error(
-    "\n  ✗ ANTHROPIC_API_KEY not set.\n" +
-      "    Add it to .env.local — see .env.example.\n",
+  // The Agent SDK has multiple auth paths (subscription, OAuth, env). Warn
+  // but proceed — the SDK will throw a clear error if it really can't auth.
+  console.warn(
+    "  ⚠ ANTHROPIC_API_KEY not in .env.local — falling back to any local\n" +
+      "    Claude credentials. Set the key explicitly if auth fails.\n",
   );
-  process.exit(1);
 }
 if (!HW_KEY || HW_KEY === "DEMO") {
   console.error(
@@ -57,7 +58,7 @@ if (!HW_KEY || HW_KEY === "DEMO") {
   process.exit(1);
 }
 // Hand off to subprocesses + SDK.
-process.env.ANTHROPIC_API_KEY = ANTHROPIC_API_KEY;
+if (ANTHROPIC_API_KEY) process.env.ANTHROPIC_API_KEY = ANTHROPIC_API_KEY;
 process.env.VITE_HW_API_KEY = env.VITE_HW_API_KEY;
 process.env.VITE_HW_SECRET_KEY = env.VITE_HW_SECRET_KEY;
 if (env.VITE_HW_API_BASE_URL) process.env.VITE_HW_API_BASE_URL = env.VITE_HW_API_BASE_URL;
@@ -73,13 +74,13 @@ if (!productId) {
 }
 
 const specPath = resolve(ROOT, `.hyperwisor/product-${productId}.json`);
+// Always re-inspect — keeps the spec on the latest extractor format and
+// catches any product changes the manufacturer made since last run.
+console.log(`\n  Inspecting product…\n`);
+await runCmd("node", ["scripts/inspect-product.mjs", productId]);
 if (!existsSync(specPath)) {
-  console.log(`\n  Spec missing — running inspector first…\n`);
-  await runCmd("node", ["scripts/inspect-product.mjs", productId]);
-  if (!existsSync(specPath)) {
-    console.error(`\n  ✗ Inspector did not produce a spec for ${productId}.\n`);
-    process.exit(1);
-  }
+  console.error(`\n  ✗ Inspector did not produce a spec for ${productId}.\n`);
+  process.exit(1);
 }
 
 const spec = JSON.parse(readFileSync(specPath, "utf8"));
