@@ -42,25 +42,37 @@ to test the onboarding flow.
 
 ## Build a product UI with an AI agent
 
-The standout feature: you don't lay out device UIs by hand. Open this repo in
-**Claude Code** (or any Claude-powered coding agent) and let it generate a
-clean, bespoke screen for each of your products.
+The standout feature: you don't lay out device UIs by hand. The starter ships
+two paths to AI-generate clean, bespoke screens — pick whichever fits your
+workflow.
+
+### Path 1 — One-command generate (recommended)
 
 ```bash
 npm run inspect                 # list your products
-npm run inspect <productId>     # write the product's spec to .hyperwisor/
+npm run generate <productId>    # AI agent builds the screen + registers it
+npm run dev
 ```
 
-Then tell the agent:
+`npm run generate` runs the full loop non-interactively: inspects the
+product, spawns the Claude Agent SDK with [`CLAUDE.md`](./CLAUDE.md) as the
+playbook, the agent writes a tailored screen into
+`src/screens/device/<product>/`, registers it, and runs `tsc` to verify.
+
+Requires `ANTHROPIC_API_KEY` in `.env.local` (see [`.env.example`](./.env.example)).
+
+### Path 2 — Interactive in Claude Code
+
+Open this repo in **Claude Code**. Tell the agent:
 
 > "Build the UI for product &lt;productId&gt;."
 
-The agent reads [`CLAUDE.md`](./CLAUDE.md) and the generated spec, then writes a
-tailored device screen into `src/screens/device/<product>/` and registers it.
-`npm run dev` → finished app. No canvas, no widget grid — real, editable,
-professionally-designed React code that you own.
+Same result — the agent reads `CLAUDE.md` + the spec and writes the screen.
+Useful when you want to chat through design choices or iterate on the
+generated UI.
 
-See [`CLAUDE.md`](./CLAUDE.md) for how generation works and
+Either path produces real, editable, professionally-designed React code that
+you own. No canvas, no widget grid. See
 [`src/screens/device/examples/SmartThermostatScreen.tsx`](./src/screens/device/examples/SmartThermostatScreen.tsx)
 for the quality bar.
 
