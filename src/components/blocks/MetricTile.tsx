@@ -35,7 +35,7 @@ export function MetricTile({
 }) {
   if (size === "hero") {
     return (
-      <div className="rounded-lg border border-border bg-card shadow-sm px-6 py-7 text-center">
+      <div className="rounded-xl bg-card shadow-lift-lg px-6 py-8 text-center">
         <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">
           {icon}
           <span>{label}</span>
@@ -58,7 +58,7 @@ export function MetricTile({
     );
   }
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm p-3.5">
+    <div className="rounded-lg bg-card shadow-lift p-4">
       <div className="flex items-center gap-1.5 text-xs font-medium text-muted">
         {icon}
         <span className="truncate">{label}</span>

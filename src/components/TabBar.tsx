@@ -12,15 +12,22 @@ const TABS = [
 export function TabBar() {
   return (
     <nav
-      className="sticky bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur-md"
+      className="sticky bottom-0 z-30 bg-background"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="flex items-stretch max-w-md mx-auto">
+      <div className="flex items-stretch gap-2.5 max-w-md mx-auto px-4 pt-3 pb-1">
         {TABS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
-            className="flex-1 flex flex-col items-center justify-center gap-1 py-2.5"
+            className={({ isActive }) =>
+              cn(
+                "flex-1 flex flex-col items-center justify-center gap-1.5 py-2.5 rounded-lg",
+                "transition-shadow duration-150",
+                // The current tab is a pressed key, not a coloured label.
+                isActive ? "shadow-press-sm" : "active:shadow-press-sm",
+              )
+            }
           >
             {({ isActive }) => (
               <>
@@ -30,12 +37,12 @@ export function TabBar() {
                     isActive ? "text-primary" : "text-muted",
                   )}
                 >
-                  <Icon size={22} strokeWidth={isActive ? 2.4 : 2} />
+                  <Icon size={21} strokeWidth={isActive ? 2.4 : 2} />
                 </span>
                 <span
                   className={cn(
-                    "text-[11px] font-medium transition-colors",
-                    isActive ? "text-primary" : "text-muted",
+                    "text-[11px] transition-colors",
+                    isActive ? "text-primary font-semibold" : "text-muted font-medium",
                   )}
                 >
                   {label}

@@ -6,9 +6,11 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "w-full h-11 rounded-md border border-border bg-card px-3.5 text-sm text-foreground",
-        "placeholder:text-muted/70 shadow-sm transition-colors",
-        "focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15",
+        // An input is a well you type into, so it is pressed, not raised --
+        // which is also what tells it apart from a button at a glance.
+        "w-full h-12 rounded-lg bg-card px-4 text-sm text-foreground border-0",
+        "placeholder:text-muted/70 shadow-press transition-shadow",
+        "focus:outline-none focus:ring-2 focus:ring-primary/30",
         "disabled:opacity-50",
         className,
       )}

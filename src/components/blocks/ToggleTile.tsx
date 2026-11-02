@@ -28,20 +28,23 @@ export function ToggleTile({
       disabled={disabled || loading}
       onClick={() => onChange(!value)}
       className={cn(
-        "w-full text-left rounded-lg border shadow-sm p-3.5 flex items-center gap-3",
-        "transition-[background-color,border-color,transform] duration-150 active:scale-[0.99]",
+        "w-full text-left rounded-lg bg-card p-4 flex items-center gap-3.5",
+        "transition-shadow duration-150",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
         "disabled:opacity-50 disabled:pointer-events-none",
-        value
-          ? "border-primary/40 bg-primary/[0.06]"
-          : "border-border bg-card hover:bg-surface",
+        // On goes INSET. In a flat theme a tint is the only way to show a
+        // selected state; here the tile itself sits down, which reads as "this
+        // one is engaged" without colouring half the list.
+        value ? "shadow-press" : "shadow-lift active:shadow-press",
       )}
     >
       {icon ? (
         <div
           className={cn(
-            "w-10 h-10 rounded-md flex items-center justify-center shrink-0 transition-colors",
-            value ? "bg-primary text-primary-foreground" : "bg-surface text-muted",
+            "w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+            value
+              ? "bg-primary text-primary-foreground shadow-lift-sm"
+              : "bg-card text-muted shadow-press-sm",
           )}
         >
           {icon}
@@ -58,14 +61,15 @@ export function ToggleTile({
       {/* Switch track */}
       <span
         className={cn(
-          "relative w-[42px] h-[26px] rounded-full p-[3px] shrink-0 transition-colors duration-200",
-          value ? "bg-primary" : "bg-border",
+          // The track is a groove, always. Only the knob changes colour, so
+          // the control looks machined rather than painted.
+          "relative w-[46px] h-[28px] rounded-full p-[3px] shrink-0 bg-card shadow-press-sm",
         )}
       >
         <span
           className={cn(
-            "block w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200",
-            value ? "translate-x-4" : "translate-x-0",
+            "block w-[22px] h-[22px] rounded-full shadow-lift-sm transition-transform duration-200",
+            value ? "translate-x-[18px] bg-primary" : "translate-x-0 bg-card",
             loading && "animate-pulse",
           )}
         />

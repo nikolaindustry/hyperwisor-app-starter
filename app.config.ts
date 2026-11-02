@@ -67,30 +67,41 @@ export const appConfig = {
   // palettes — the neutrals are tuned for a clean, professional look.
   defaultThemeMode: "system" as "light" | "dark" | "system",
   theme: {
+    // Soft UI: `background` and `card` are deliberately THE SAME colour.
+    // Depth comes from a light above-left and a shadow below-right, so a card
+    // has to sit on its own tone -- there is nothing lighter than white to
+    // highlight with, which is why the ground moved off #FBFBFC.
+    //
+    // The text shades are darker than a flat theme's for a reason: on this
+    // ground the old #71717A grey falls to 3.5:1 and #16A34A to 2.7:1, both
+    // below WCAG AA. Fills stay bright; only text shades moved.
     light: {
       primary: "#2563EB",
       primaryForeground: "#FFFFFF",
-      accent: "#0D9488",
-      background: "#FBFBFC", // app background
-      card: "#FFFFFF", // panels / cards
-      surface: "#F4F4F5", // subtle fills: chips, icon wells, secondary buttons
-      text: "#18181B",
-      muted: "#71717A", // secondary text
-      border: "#E4E4E7", // hairline
-      success: "#16A34A",
-      danger: "#DC2626",
+      accent: "#0F766E",
+      background: "#E9EBF0", // the ground
+      card: "#E9EBF0", // same as the ground, on purpose
+      surface: "#DFE2E9", // recessed wells
+      text: "#17191D",
+      muted: "#5A5F6B", // 5.3:1
+      border: "#D3D7E0", // only for hairlines the shadows cannot carry
+      success: "#166534", // 5.9:1
+      danger: "#991B1B",
     },
+    // Dark needs the same lift for the same reason: #09090B leaves no room
+    // for a light edge either. This is a visible change on OLED -- a near
+    // black ground cannot do soft UI, so it is a trade, not an oversight.
     dark: {
       primary: "#3B82F6",
       primaryForeground: "#FFFFFF",
       accent: "#2DD4BF",
-      background: "#09090B",
-      card: "#131316",
-      surface: "#1F1F23",
-      text: "#FAFAFA",
-      muted: "#A1A1AA",
-      border: "#27272A",
-      success: "#22C55E",
+      background: "#1C1E22",
+      card: "#1C1E22",
+      surface: "#17191C",
+      text: "#F2F3F5",
+      muted: "#A2A8B4", // 7.1:1
+      border: "#2A2E34",
+      success: "#4ADE80",
       danger: "#F87171",
     },
   },

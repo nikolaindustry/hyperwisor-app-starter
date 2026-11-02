@@ -11,7 +11,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-lg border border-border bg-card shadow-sm",
+        // Soft UI: no border. The lift IS the edge; adding a rule as well
+        // reads as outlined rather than raised.
+        "rounded-lg bg-card shadow-lift",
         flush ? "" : "p-4",
         className,
       )}

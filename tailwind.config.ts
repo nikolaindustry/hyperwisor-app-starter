@@ -30,6 +30,12 @@ export default {
         DEFAULT: "var(--shadow-md)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",
+        // Soft UI. `lift` raises a surface, `press` recesses it.
+        lift: "var(--shadow-lift)",
+        "lift-sm": "var(--shadow-lift-sm)",
+        "lift-lg": "var(--shadow-lift-lg)",
+        press: "var(--shadow-press)",
+        "press-sm": "var(--shadow-press-sm)",
       },
       keyframes: {
         "fade-in": {
