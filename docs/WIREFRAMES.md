@@ -18,7 +18,7 @@ in another stack.
 │                                 │
 │            [ LOGO ]             │
 │                                 │
-│        Acme Smart Home          │
+│        Acme Devices             │
 │  Control your devices, anywhere.│
 │                                 │
 │                                 │
@@ -104,11 +104,11 @@ locally before calling `POST /auth/signup`, then auto-signs the user in.
 ├─────────────────────────────────┤
 │  THERMOSTAT                     │
 │  ┌─────────────────────────────┐│
-│  │ [T] Living Room Therm.   ●  ││
+│  │ [T] Hall Thermostat      ●  ││
 │  │     Smart Thermostat  Online││
 │  └─────────────────────────────┘│
 │  ┌─────────────────────────────┐│
-│  │ [T] Bedroom Thermostat   ◌  ││
+│  │ [T] Spare Thermostat     ◌  ││
 │  │     Smart Thermostat  5h ago││
 │  └─────────────────────────────┘│
 │                                 │
@@ -182,7 +182,7 @@ In single-product mode, mismatched QR codes are rejected client-side.
 │                                 │
 │  Give it a name                 │
 │  ┌─────────────────────────────┐│
-│  │ Living Room Thermostat      ││
+│  │ Hall Thermostat             ││
 │  └─────────────────────────────┘│
 │  You can rename it later.       │
 │                                 │
@@ -200,11 +200,11 @@ API: `POST /onboarding/device`. On success → routes to Device Detail.
 
 ```
 ┌─────────────────────────────────┐
-│  ←  Living Room Thermostat      │
+│  ←  Hall Thermostat             │
 ├─────────────────────────────────┤
 │  ┌─────────────────────────────┐│
 │  │ SMART THERMOSTAT     [● On] ││
-│  │ Living Room Thermostat      ││
+│  │ Hall Thermostat             ││
 │  │ ID TH-A1B2C3                ││
 │  └─────────────────────────────┘│
 │  ┌─────────────────────────────┐│
@@ -269,7 +269,7 @@ Future home for rename, sharing, fw-update buttons.
 │  │   support@acme.com          ││
 │  └─────────────────────────────┘│
 │  ┌─────────────────────────────┐│
-│  │ ⓘ Acme Smart Home v0.1.0    ││
+│  │ ⓘ Acme Devices v0.1.0       ││
 │  └─────────────────────────────┘│
 │  ┌───────────────────────────┐  │
 │  │       Sign out            │  │

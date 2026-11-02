@@ -69,7 +69,7 @@ export function NameDeviceScreen() {
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Living Room Thermostat"
+              placeholder="Hall Thermostat"
               autoFocus
               required
             />

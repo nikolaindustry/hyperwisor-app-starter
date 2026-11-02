@@ -18,8 +18,12 @@ export type AppMode = "single-product" | "multi-product";
 
 export const appConfig = {
   // --- Identity ---------------------------------------------------
-  appName: "Acme Smart Home",
-  bundleId: "com.acme.smarthome",
+  // Neutral on purpose. This starter ships for EV chargers, soil sensors and
+  // bike trackers as readily as thermostats, so its own defaults should not
+  // make every fresh clone look like a smart-home app before the
+  // manufacturer has changed a thing.
+  appName: "Acme Devices",
+  bundleId: "com.acme.devices",
   logoUrl: "/logo.svg",
   supportEmail: "support@acme.com",
   version: "0.1.0",

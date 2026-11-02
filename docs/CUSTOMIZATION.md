@@ -8,8 +8,8 @@ This guide walks through the rest.
 Edit `app.config.ts`:
 
 ```ts
-appName: "Acme Smart Home",
-bundleId: "com.acme.smarthome",  // change BEFORE first cap:add
+appName: "Acme Devices",
+bundleId: "com.acme.devices",  // change BEFORE first cap:add
 logoUrl: "/logo.svg",            // drop into public/, reference by path
 supportEmail: "support@acme.com",
 ```
