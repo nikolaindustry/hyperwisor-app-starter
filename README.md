@@ -25,6 +25,30 @@ Open <http://localhost:5173>. You're now signed in as `demo@hyperwisor.com` /
 `demo1234` with two pre-loaded fake devices. Tap **Add device → Try a demo QR**
 to test the onboarding flow.
 
+### Run it on a phone
+
+```bash
+npm install --legacy-peer-deps
+npx cap add android          # or: npx cap add ios
+npm run setup:android        # android only — see below
+npm run build && npx cap sync android
+npx cap open android
+```
+
+`setup:android` patches the generated platform so provisioning can work: it
+permits cleartext to the device's setup access point (and nowhere else), adds
+the camera permission the QR scanner needs, and switches Gradle to the smaller
+`-bin` distribution. It is idempotent — run it after every `cap add`.
+
+<details>
+<summary><strong>Why a script rather than committed files</strong></summary>
+
+`android/` is git-ignored because Capacitor regenerates it, so these three
+fixes cannot live in the repo as files. Without them a fresh platform builds
+fine and then fails at the one step that matters: handing Wi-Fi credentials to
+a device over its own access point, which Android blocks as cleartext.
+</details>
+
 ### Go live
 
 1. Get your `mk_…` API key and `msk_…` secret key from the Hyperwisor

@@ -42,7 +42,20 @@ In mock mode the flow is simulated so the demo completes — see
 
 ### Android
 
-`android/app/src/main/res/xml/network_security_config.xml`:
+Run this once after `npx cap add android`, and again any time the platform is
+regenerated:
+
+```bash
+npm run setup:android
+```
+
+It is idempotent, and it applies the three things a generated platform is
+missing: the cleartext rule below, the `CAMERA` permission the QR scanner
+needs, and the smaller `-bin` Gradle distribution (131 MB rather than 219 MB,
+identical builds). The `android/` folder is git-ignored because Capacitor
+regenerates it, so these cannot ship as files in the repo.
+
+What it writes — `android/app/src/main/res/xml/network_security_config.xml`:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -57,7 +70,7 @@ In mock mode the flow is simulated so the demo completes — see
 </network-security-config>
 ```
 
-Reference it from `AndroidManifest.xml`:
+and the matching attribute on `<application>` in `AndroidManifest.xml`:
 
 ```xml
 <application android:networkSecurityConfig="@xml/network_security_config" …>

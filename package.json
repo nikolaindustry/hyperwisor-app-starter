@@ -15,10 +15,12 @@
     "cap:add:ios": "cap add ios",
     "cap:sync": "npm run build && cap sync",
     "cap:run:android": "npm run cap:sync && cap run android",
-    "cap:run:ios": "npm run cap:sync && cap run ios"
+    "cap:run:ios": "npm run cap:sync && cap run ios",
+    "setup:android": "node scripts/setup-android.mjs"
   },
   "dependencies": {
     "@capacitor-community/barcode-scanner": "^4.0.1",
+    "@capacitor/android": "^7.6.10",
     "@capacitor/app": "^7.0.1",
     "@capacitor/core": "^7.3.0",
     "@capacitor/preferences": "^7.0.0",
