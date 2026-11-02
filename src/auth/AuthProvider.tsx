@@ -41,8 +41,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const persist = React.useCallback(async (s: Session | null) => {
     setSession(s);
-    if (s) await storage.set(STORAGE_KEY, JSON.stringify(s));
-    else await storage.remove(STORAGE_KEY);
+    // A storage failure must not fail the sign-in. The session is already in
+    // memory and works for this run; all that is lost is surviving a restart.
+    // Reporting "could not sign in" when the user is, in fact, signed in sends
+    // them to re-check a password that was never the problem.
+    try {
+      if (s) await storage.set(STORAGE_KEY, JSON.stringify(s));
+      else await storage.remove(STORAGE_KEY);
+    } catch (e) {
+      console.warn("[auth] could not persist the session:", (e as Error).message);
+    }
   }, []);
 
   // The transport reads the access token through a ref, so a token refresh is

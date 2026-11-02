@@ -204,6 +204,10 @@ let flushing = false;
  * network returns, and on startup.
  */
 export async function flushPendingRegistrations(): Promise<number> {
+  // Demo mode has no account to register against, and the mock session's
+  // token is not a real one -- sending it just earns a 401 per attempt, every
+  // sign-in and every app resume.
+  if (isMockMode()) return 0;
   if (flushing) return 0;
   flushing = true;
   try {
