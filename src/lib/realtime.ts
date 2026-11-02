@@ -1,10 +1,9 @@
 /**
- * Realtime connection manager (live mode).
+ * Realtime façade (live mode).
  *
- * One shared WebSocket to the Hyperwisor relay, keyed by the signed-in
- * user id. Used for both directions:
- *   - inbound  : telemetry frames from devices
- *   - outbound : commands to devices
+ * The transport is the Hyperwisor Secure Channel -- see ./secureRelay.ts for
+ * the handshake, keepalive and reconnect behaviour. This file only mints the
+ * session token and keeps the connection tied to the signed-in user.
  *
  * Wire format for sending a command (verified against the platform's
  * deviceWebSocketService):
@@ -14,86 +13,98 @@
  */
 
 import { appConfig } from "@config";
+import { secureRelay } from "./secureRelay";
 import type { DeviceCommand, RealtimeMessage } from "./types";
 
 type MessageHandler = (msg: RealtimeMessage) => void;
 
-let socket: WebSocket | null = null;
-let currentUserId: string | null = null;
-let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
-const handlers = new Set<MessageHandler>();
-const pendingSends: string[] = [];
+/** Returns the signed-in user's access token, or null. Set by the auth layer. */
+type AccessTokenGetter = () => string | null | undefined;
 
-function flushPending() {
-  if (socket?.readyState !== WebSocket.OPEN) return;
-  while (pendingSends.length) socket.send(pendingSends.shift()!);
-}
+let getAccessToken: AccessTokenGetter = () => null;
 
-function open(userId: string) {
-  if (socket && currentUserId === userId &&
-      (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
-    return;
+/**
+ * Mint a short-lived relay session token.
+ *
+ * `relay-token` derives the socket's grants from whoever is signed in, so the
+ * user's own access token is what authorises the mint. It requires nothing
+ * else: measured against the deployed function, a request with no
+ * Authorization is UNAUTHORIZED_NO_AUTH_HEADER and a malformed one is
+ * UNAUTHORIZED_INVALID_JWT_FORMAT.
+ */
+async function mintRelayToken(): Promise<string | null> {
+  const accessToken = getAccessToken();
+  if (!accessToken) return null;
+
+  try {
+    const res = await fetch(`${appConfig.apiBaseUrl}/relay-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!res.ok) {
+      console.warn("[HSC] relay-token failed:", res.status);
+      return null;
+    }
+    const data = (await res.json()) as { token?: string };
+    return data?.token ?? null;
+  } catch (err) {
+    console.warn("[HSC] relay-token error:", (err as Error).message);
+    return null;
   }
-  currentUserId = userId;
-  socket?.close();
-
-  socket = new WebSocket(`${appConfig.realtimeUrl}/?id=${encodeURIComponent(userId)}`);
-
-  socket.onopen = () => flushPending();
-
-  socket.onmessage = (event) => {
-    let msg: RealtimeMessage;
-    try {
-      msg = JSON.parse(event.data);
-    } catch {
-      return; // ignore malformed frames
-    }
-    handlers.forEach((h) => h(msg));
-  };
-
-  socket.onclose = () => {
-    // Reconnect with backoff while a user is still signed in.
-    if (currentUserId && !reconnectTimer) {
-      reconnectTimer = setTimeout(() => {
-        reconnectTimer = null;
-        if (currentUserId) open(currentUserId);
-      }, 2000);
-    }
-  };
-
-  socket.onerror = () => socket?.close();
 }
 
 export const realtime = {
-  /** Ensure a connection exists for this user. Safe to call repeatedly. */
-  connect(userId: string) {
-    open(userId);
+  /** Supply the token getter before connecting. */
+  useAccessToken(getter: AccessTokenGetter) {
+    getAccessToken = getter;
   },
 
-  /** Tear down the connection (on sign-out). */
+  /** Ensure a connection exists for this user. Safe to call repeatedly. */
+  connect(userId: string) {
+    secureRelay.connect(userId, mintRelayToken);
+  },
+
+  /**
+   * Tear down the connection (on sign-out).
+   *
+   * This matters for more than tidiness: a socket keeps the grants it
+   * authenticated with for life, so one that outlives an account switch
+   * carries the previous identity's authority.
+   */
   disconnect() {
-    currentUserId = null;
-    if (reconnectTimer) {
-      clearTimeout(reconnectTimer);
-      reconnectTimer = null;
-    }
-    socket?.close();
-    socket = null;
+    secureRelay.disconnect();
+  },
+
+  /** Reconnect if the socket died while the app was backgrounded. */
+  resume() {
+    secureRelay.resume();
+  },
+
+  /** True once the HSC handshake has completed. */
+  get isConnected() {
+    return secureRelay.isConnected;
   },
 
   /** Subscribe to all inbound frames. Returns an unsubscribe function. */
   onMessage(handler: MessageHandler): () => void {
-    handlers.add(handler);
-    return () => handlers.delete(handler);
+    return secureRelay.onMessage(handler);
+  },
+
+  /** Subscribe to connection state. Returns an unsubscribe function. */
+  onConnectionChange(handler: (connected: boolean) => void): () => void {
+    return secureRelay.onConnectionChange(handler);
+  },
+
+  /** Ask the relay which devices are connected. */
+  requestPresence() {
+    secureRelay.requestPresence();
   },
 
   /** Send commands to a device. */
   sendCommand(deviceId: string, commands: DeviceCommand[], widgetId?: string) {
-    const frame = JSON.stringify({
-      targetId: deviceId,
-      payload: { ...(widgetId ? { widgetId } : {}), commands },
-    });
-    if (socket?.readyState === WebSocket.OPEN) socket.send(frame);
-    else pendingSends.push(frame); // sent on (re)connect
+    secureRelay.sendCommand(deviceId, commands, widgetId);
   },
 };

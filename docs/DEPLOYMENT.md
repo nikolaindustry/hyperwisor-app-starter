@@ -17,7 +17,7 @@ correct backend before building.
 One-time setup:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 npm run build
 npm run cap:add:android
 ```

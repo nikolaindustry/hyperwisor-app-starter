@@ -27,7 +27,7 @@ forwards requests:
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    const targetUrl = `https://cgsuxlbravclbbpnvfky.supabase.co/functions/v1/manufacturer-api${url.pathname}${url.search}`;
+    const targetUrl = `https://hyperwisor.nikolaindustry.workers.dev/functions/v1/manufacturer-api${url.pathname}${url.search}`;
     const headers = new Headers(req.headers);
     headers.set("x-api-key", env.HYPERWISOR_API_KEY);
     headers.set("x-secret-key", env.HYPERWISOR_SECRET_KEY);

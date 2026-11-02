@@ -236,7 +236,8 @@ API: `POST /onboarding/device`. On success → routes to Device Detail.
 └─────────────────────────────────┘
 ```
 
-Live data: subscribes to `wss://nikolaindustry-realtime.onrender.com/?id=<userId>`,
+Live data: subscribes to `wss://hyperwisor-realtime-secure.onrender.com/?id=<userId>`
+after the HSC handshake (see `src/lib/secureRelay.ts`),
 filters frames by `device_id`. Historical: `GET /sensor-data?device_id=…`.
 
 The **Controls** section is auto-generated from `product_commands[]` returned

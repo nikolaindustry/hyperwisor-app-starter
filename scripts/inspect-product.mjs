@@ -35,7 +35,7 @@ const API_KEY = env.VITE_HW_API_KEY;
 const SECRET_KEY = env.VITE_HW_SECRET_KEY;
 const BASE_URL =
   env.VITE_HW_API_BASE_URL ||
-  "https://cgsuxlbravclbbpnvfky.supabase.co/functions/v1";
+  "https://hyperwisor.nikolaindustry.workers.dev/functions/v1";
 
 if (!API_KEY || !SECRET_KEY || API_KEY === "DEMO") {
   console.error(

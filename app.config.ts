@@ -44,10 +44,19 @@ export const appConfig = {
   secretKey: import.meta.env.VITE_HW_SECRET_KEY || "DEMO",
   apiBaseUrl:
     import.meta.env.VITE_HW_API_BASE_URL ||
-    "https://cgsuxlbravclbbpnvfky.supabase.co/functions/v1",
-  realtimeUrl:
-    import.meta.env.VITE_HW_REALTIME_URL ||
-    "wss://nikolaindustry-realtime.onrender.com",
+    "https://hyperwisor.nikolaindustry.workers.dev/functions/v1",
+
+  // The Hyperwisor Secure Channel. This is the platform's ONLY relay; the
+  // previous unauthenticated one was retired on 2026-07-30 and has since been
+  // repurposed for unrelated work.
+  //
+  // Do not point this anywhere else to "test" something. A WebSocket that
+  // never opens looks exactly like a device that is merely offline, so a
+  // wrong host here fails silently -- no error, no log, just an app where
+  // nothing ever responds.
+  relayHost:
+    import.meta.env.VITE_HW_RELAY_HOST ||
+    "hyperwisor-realtime-secure.onrender.com",
 
   // --- Theme ------------------------------------------------------
   // Light + dark palettes, piped to Tailwind via CSS variables.

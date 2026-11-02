@@ -17,7 +17,7 @@ device line.
 ```bash
 git clone <your-repo> my-brand-app
 cd my-brand-app
-npm install
+npm install --legacy-peer-deps
 npm run dev
 ```
 
@@ -36,7 +36,31 @@ to test the onboarding flow.
    ```
    `.env.local` is git-ignored — your keys never get committed.
 3. Restart `npm run dev`. The mock banner disappears; auth and device APIs now
-   hit the real backend.
+   hit the real backend, and the app connects to the Hyperwisor Secure Channel.
+
+<details>
+<summary><strong>Why <code>--legacy-peer-deps</code></strong></summary>
+
+`@capacitor-community/barcode-scanner` declares a peer dependency on Capacitor
+5 while this project is on Capacitor 7. The pairing works — it is what the
+Hyperwisor apps ship on device — but npm refuses to resolve it without the
+flag. A plain `npm install` fails with `ERESOLVE`.
+</details>
+
+### Connectivity, in one paragraph
+
+The app talks to devices over the **Hyperwisor Secure Channel (HSC)**, which
+does not accept anonymous sockets. On connect the relay issues a challenge; the
+app answers with a short-lived session token minted from the signed-in user by
+the `relay-token` function, and only then are frames delivered or accepted. The
+grants on that token come from whoever was signed in at the time, so signing in
+or out tears the socket down and reopens it — a connection that outlived an
+account switch would carry the old identity's authority.
+
+You do not configure any of this. It is in `src/lib/secureRelay.ts`, which also
+handles the keepalive and reconnect behaviour that connecting over the open
+internet requires. Read the comments there before changing it; each one is a
+bug that was paid for once already.
 
 ---
 

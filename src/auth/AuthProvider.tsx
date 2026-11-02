@@ -41,11 +41,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     else await storage.remove(STORAGE_KEY);
   }, []);
 
+  // The transport reads the access token through a ref, so a token refresh is
+  // picked up on the next reconnect without re-opening the socket here.
+  const sessionRef = React.useRef<Session | null>(null);
+  sessionRef.current = session;
+  React.useEffect(() => {
+    sdk.useAccessToken(() => sessionRef.current?.access_token);
+  }, []);
+
   // Keep the realtime connection in sync with the signed-in user.
+  //
+  // Signing in or out tears the socket down deliberately: a socket keeps the
+  // grants it authenticated with for life, so one that outlived an account
+  // switch would carry the previous identity's authority.
   React.useEffect(() => {
     const userId = session?.user?.id;
     if (userId) sdk.connectRealtime(userId);
     return () => sdk.disconnectRealtime();
+  }, [session?.user?.id]);
+
+  // Reconnect when the app returns to the foreground. The WebView is frozen
+  // while backgrounded, so the reconnect timer never fires there.
+  React.useEffect(() => {
+    if (!session?.user?.id) return;
+
+    let detach: (() => void) | undefined;
+    void (async () => {
+      try {
+        const { App } = await import("@capacitor/app");
+        const handle = await App.addListener("appStateChange", ({ isActive }) => {
+          if (isActive) sdk.resumeRealtime();
+        });
+        detach = () => void handle.remove();
+      } catch {
+        // Web build: no Capacitor runtime. visibilitychange is the equivalent.
+        const onVisible = () => {
+          if (document.visibilityState === "visible") sdk.resumeRealtime();
+        };
+        document.addEventListener("visibilitychange", onVisible);
+        detach = () => document.removeEventListener("visibilitychange", onVisible);
+      }
+    })();
+
+    return () => detach?.();
   }, [session?.user?.id]);
 
   const signIn = React.useCallback(

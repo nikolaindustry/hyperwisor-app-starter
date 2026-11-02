@@ -128,12 +128,33 @@ export const sdk = {
   },
 
   // --- Realtime ---
+  /**
+   * Tell the transport how to read the current access token. The HSC mints a
+   * session token from it, so this must be set before connecting.
+   */
+  useAccessToken(getter: () => string | null | undefined) {
+    if (!isMockMode()) realtime.useAccessToken(getter);
+  },
   /** Open/refresh the realtime connection for a user. Called by AuthProvider. */
   connectRealtime(userId: string) {
     if (!isMockMode()) realtime.connect(userId);
   },
   disconnectRealtime() {
     if (!isMockMode()) realtime.disconnect();
+  },
+  /**
+   * Reconnect after the app returns to the foreground.
+   *
+   * During an app switch the WebView is frozen, so the backoff timer that
+   * would have reconnected does not run -- the app comes back showing a live
+   * UI over a dead socket.
+   */
+  resumeRealtime() {
+    if (!isMockMode()) realtime.resume();
+  },
+  /** True once the HSC handshake has completed (always true in mock mode). */
+  isRealtimeConnected(): boolean {
+    return isMockMode() ? true : realtime.isConnected;
   },
 
   /**
