@@ -8,6 +8,7 @@ import { DeviceListScreen } from "@/screens/DeviceListScreen";
 import { ActivityScreen } from "@/screens/ActivityScreen";
 import { AddDeviceScreen } from "@/screens/AddDeviceScreen";
 import { NameDeviceScreen } from "@/screens/NameDeviceScreen";
+import { DeviceSetupScreen } from "@/screens/DeviceSetupScreen";
 import { DeviceDetailScreen } from "@/screens/DeviceDetailScreen";
 import { DeviceSettingsScreen } from "@/screens/DeviceSettingsScreen";
 import { AccountScreen } from "@/screens/AccountScreen";
@@ -69,6 +70,14 @@ export function App() {
             element={
               <RequireAuth>
                 <NameDeviceScreen />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/devices/:id/setup"
+            element={
+              <RequireAuth>
+                <DeviceSetupScreen />
               </RequireAuth>
             }
           />

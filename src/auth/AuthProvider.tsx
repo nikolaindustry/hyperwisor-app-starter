@@ -1,6 +1,10 @@
 import * as React from "react";
 import { sdk } from "@/lib/sdk";
 import { storage } from "@/lib/storage";
+import {
+  useAccessTokenForRegistration,
+  flushPendingRegistrations,
+} from "@/lib/provisioning";
 import type { Session, User } from "@/lib/types";
 
 type AuthState = {
@@ -47,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   sessionRef.current = session;
   React.useEffect(() => {
     sdk.useAccessToken(() => sessionRef.current?.access_token);
+    useAccessTokenForRegistration(() => sessionRef.current?.access_token);
   }, []);
 
   // Keep the realtime connection in sync with the signed-in user.
@@ -56,7 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // switch would carry the previous identity's authority.
   React.useEffect(() => {
     const userId = session?.user?.id;
-    if (userId) sdk.connectRealtime(userId);
+    if (userId) {
+      sdk.connectRealtime(userId);
+      // The app may have been killed between capturing a device key and
+      // sending it. The queue survives that; nothing else would retry it.
+      void flushPendingRegistrations();
+    }
     return () => sdk.disconnectRealtime();
   }, [session?.user?.id]);
 
@@ -70,13 +80,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const { App } = await import("@capacitor/app");
         const handle = await App.addListener("appStateChange", ({ isActive }) => {
-          if (isActive) sdk.resumeRealtime();
+          if (isActive) {
+            sdk.resumeRealtime();
+            // A key captured on the device's access point could not be sent
+            // then; this is a chance to try again.
+            void flushPendingRegistrations();
+          }
         });
         detach = () => void handle.remove();
       } catch {
         // Web build: no Capacitor runtime. visibilitychange is the equivalent.
         const onVisible = () => {
-          if (document.visibilityState === "visible") sdk.resumeRealtime();
+          if (document.visibilityState === "visible") {
+            sdk.resumeRealtime();
+            void flushPendingRegistrations();
+          }
         };
         document.addEventListener("visibilitychange", onVisible);
         detach = () => document.removeEventListener("visibilitychange", onVisible);

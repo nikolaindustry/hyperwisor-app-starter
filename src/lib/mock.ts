@@ -210,6 +210,23 @@ export const mock = {
     mockDevices = [newDevice, ...mockDevices];
     return delay({ success: true, device: newDevice });
   },
+  /**
+   * Provisioning, demo edition.
+   *
+   * The real thing needs the phone to be on the device's access point and a
+   * native HTTP stack, neither of which exists in a browser. Rather than let
+   * the demo dead-end on "couldn't reach the device", it pretends: the delay
+   * is roughly what handing credentials over actually takes, so the screens
+   * are exercised at realistic speed.
+   */
+  async provisionDevice(targetId: string) {
+    return delay({ ok: true, deviceId: targetId }, 2200);
+  },
+  /** In the demo a device is always seen shortly after provisioning. */
+  async awaitPresence() {
+    return delay(true, 3000);
+  },
+
   async getUserDevices() {
     return delay({ success: true, devices: mockDevices, count: mockDevices.length });
   },

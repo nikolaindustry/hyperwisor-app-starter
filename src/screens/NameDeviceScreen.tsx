@@ -31,8 +31,14 @@ export function NameDeviceScreen() {
         device_name: name.trim(),
         device_identifier: qrInfo?.deviceId,
       });
-      toast.push("Device added", "success");
-      navigate(`/devices/${res.device.id}`, { replace: true });
+      // Straight into setup rather than the device page: a device that has
+      // been added but never provisioned is not usable, and sending the person
+      // to a dashboard for a device that has never been online reads as a
+      // broken app rather than an unfinished setup.
+      navigate(`/devices/${res.device.id}/setup`, {
+        replace: true,
+        state: { device: res.device },
+      });
     } catch (err) {
       toast.push((err as Error).message || "Could not add device", "danger");
     }
@@ -74,7 +80,7 @@ export function NameDeviceScreen() {
             loading={onboard.isPending}
             className="mt-1"
           >
-            Add device
+            Add and set up
           </Button>
         </form>
       </div>
