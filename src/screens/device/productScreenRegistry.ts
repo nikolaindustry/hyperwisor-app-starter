@@ -3,6 +3,7 @@ import { SmartThermostatScreen } from "./examples/SmartThermostatScreen";
 import { SmartBikeScreen } from "./smart-bike/SmartBikeScreen";
 import { GangSwitchScreen } from "./gang-switch/GangSwitchScreen";
 import { SmartDualSocketPlugScreen } from "./smart-dual-socket-plug/SmartDualSocketPlugScreen";
+import { CamperVanScreen } from "./camper-van/CamperVanScreen";
 
 /**
  * Maps a product id → its bespoke device screen.
@@ -34,6 +35,8 @@ export const productScreens: Record<string, DeviceScreen> = {
   "4fb8f51a-0f84-4cae-9060-27d8949360e2": GangSwitchScreen,
   // Smart Dual-Socket Plug (SDP-2000)
   "232d1168-8ba2-4aa4-a50d-c87dd332e8a4": SmartDualSocketPlugScreen,
+  // Camper Van HMI — vocabulary in the firmware repo, docs/CLOUD_COMMANDS.md
+  "1f577a41-080e-4f77-8162-30df2c5e82e9": CamperVanScreen,
 };
 
 export function getDeviceScreen(productId: string): DeviceScreen | null {

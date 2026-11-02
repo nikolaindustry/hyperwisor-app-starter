@@ -227,6 +227,45 @@ export const mock = {
     return delay(true, 3000);
   },
 
+  /**
+   * Demo stand-in for a device's command replies.
+   *
+   * Answers `get_status` once, shortly after a screen subscribes, with the
+   * shape the Camper Van panel really sends. Enough to exercise a bespoke
+   * screen without hardware.
+   */
+  subscribeDeviceMessages(
+    _deviceId: string,
+    onMessage: (msg: { command: string; action: string; params: Record<string, unknown> }) => void,
+  ): () => void {
+    const t = setTimeout(() => {
+      onMessage({
+        command: "get_status",
+        action: "response",
+        params: {
+          relays: [0, 1, 2, 3, 4, 5, 6, 7].map((relay) => ({
+            relay,
+            state: relay === 0 || relay === 3,
+          })),
+          bmp280: { valid: true, temp_c: 21.4, hpa: 1013.2 },
+          hvac: {
+            power: true,
+            auto: false,
+            fan_level: 3,
+            fan_step: 2,
+            clutch: true,
+            cabin_valid: true,
+            cabin_c: 22.8,
+            delta_c: 0.8,
+            target_c: 22,
+            mode: "cooling",
+          },
+        },
+      });
+    }, 600);
+    return () => clearTimeout(t);
+  },
+
   async getUserDevices() {
     return delay({ success: true, devices: mockDevices, count: mockDevices.length });
   },

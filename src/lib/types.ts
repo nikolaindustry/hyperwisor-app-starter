@@ -84,6 +84,16 @@ export type SensorReading = {
  */
 export type CommandParams = Record<string, string | number | boolean>;
 
+/**
+ * Params on a reply FROM a device.
+ *
+ * Deliberately wider than CommandParams: what you send a device is flat
+ * scalars, but what it sends back is arbitrary JSON -- the Camper Van's
+ * `get_status`, for instance, answers with a `relays` array and a nested
+ * `hvac` object. A screen narrows these itself.
+ */
+export type DeviceReplyParams = Record<string, unknown>;
+
 export type DeviceAction = {
   action: string;
   params?: CommandParams;

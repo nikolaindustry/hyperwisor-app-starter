@@ -17,6 +17,7 @@ import type {
   UserDevice,
   SensorReading,
   DeviceCommand,
+  DeviceReplyParams,
 } from "./types";
 
 type RequestInitWithAuth = RequestInit & { authToken?: string };
@@ -155,6 +156,43 @@ export const sdk = {
   /** True once the HSC handshake has completed (always true in mock mode). */
   isRealtimeConnected(): boolean {
     return isMockMode() ? true : realtime.isConnected;
+  },
+
+  /**
+   * Subscribe to a device's own command replies.
+   *
+   * `subscribeTelemetry` only surfaces frames carrying a numeric value, so a
+   * screen that asks a device something -- `get_status`, or the ack from a
+   * relay write -- had no way to hear the answer. This passes the envelope
+   * through as { command, action, params }.
+   *
+   * Returns an unsubscribe function.
+   */
+  subscribeDeviceMessages(
+    deviceId: string,
+    userId: string,
+    onMessage: (msg: { command: string; action: string; params: DeviceReplyParams }) => void,
+  ): () => void {
+    if (isMockMode()) return mock.subscribeDeviceMessages(deviceId, onMessage);
+
+    realtime.connect(userId);
+    return realtime.onMessage((frame) => {
+      const f = frame as unknown as {
+        from?: string;
+        targetId?: string;
+        payload?: { commands?: { command?: string; actions?: { action?: string; params?: DeviceReplyParams }[] }[] };
+      };
+      // The relay labels the sender `from`; some paths echo `targetId`.
+      const sender = f.from ?? f.targetId;
+      if (sender !== deviceId) return;
+
+      for (const c of f.payload?.commands ?? []) {
+        for (const a of c.actions ?? []) {
+          if (!c.command || !a.action) continue;
+          onMessage({ command: c.command, action: a.action, params: a.params ?? {} });
+        }
+      }
+    });
   },
 
   /**
