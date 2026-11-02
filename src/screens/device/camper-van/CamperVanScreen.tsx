@@ -22,8 +22,8 @@
  */
 
 import * as React from "react";
-import { Lightbulb, Wind, Thermometer, Gauge, Power, Sparkles } from "lucide-react";
-import { Section, StatusHeader, MetricTile, MetricGrid, ToggleTile, Card, Button } from "@/components/blocks";
+import { Lightbulb, Wind, Thermometer, Gauge, Power, Sparkles, Check } from "lucide-react";
+import { Section, StatusHeader, MetricTile, MetricGrid, ToggleTile, Card, Button, Input } from "@/components/blocks";
 import { StepperControl } from "@/components/blocks";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/auth/AuthProvider";
@@ -69,6 +69,19 @@ export function CamperVanScreen({ device }: DeviceScreenProps) {
   const [busy, setBusy] = React.useState<string | null>(null);
   const [heard, setHeard] = React.useState(false);
 
+  /* The greeting shown on the panel's Overview tab. `welcome` is what the
+   * panel reported; `draft` is what is in the box. Keeping them apart means
+   * a status arriving mid-edit does not yank the text from under you. */
+  const [welcome, setWelcome] = React.useState("");
+  const [draft, setDraft] = React.useState("");
+  const [editingName, setEditingName] = React.useState(false);
+  /* The status subscription is created once, so reading `editingName` from
+   * its closure would always see the value at mount. A ref gives the
+   * callback the current one -- otherwise a status landing mid-edit would
+   * overwrite what is being typed. */
+  const editingRef = React.useRef(false);
+  editingRef.current = editingName;
+
   /* Listen for the panel's replies, then ask for a full status. */
   React.useEffect(() => {
     if (!user?.id) return;
@@ -93,6 +106,12 @@ export function CamperVanScreen({ device }: DeviceScreenProps) {
 
       const h = params.hvac as Partial<Hvac> | undefined;
       if (h) setHvac((prev) => ({ ...prev, ...h }));
+
+      if (typeof params.welcome === "string") {
+        setWelcome(params.welcome);
+        // Only seed the box when it is not being edited.
+        setDraft((d) => (editingRef.current ? d : (params.welcome as string)));
+      }
     });
 
     void sdk.sendCommand(device.id, [{ command: "get_status", actions: [{ action: "read" }] }]);
@@ -151,6 +170,19 @@ export function CamperVanScreen({ device }: DeviceScreenProps) {
     void send("hvac_control", [{ action: "set_temp", params: { temp_c: clamped } }], "hvac-temp");
   }
 
+  /* The panel caps the name at 32 characters (OWNER_NAME_MAX) and persists
+   * it itself, re-fitting its cursive font to the new length. */
+  function saveWelcome() {
+    const name = draft.trim().slice(0, 32);
+    if (!name || name === welcome) {
+      setEditingName(false);
+      return;
+    }
+    setWelcome(name);
+    setEditingName(false);
+    void send("config", [{ action: "set", params: { welcome: name } }], "welcome");
+  }
+
   function setZone(zone: "roof" | "floor", hex: string) {
     void send("rgb_control", [{ action: zone, params: { hex } }], `rgb-${zone}`);
   }
@@ -165,6 +197,40 @@ export function CamperVanScreen({ device }: DeviceScreenProps) {
         online={device.is_online ?? false}
         lastSeen={device.last_seen}
       />
+
+      <Section title="Panel greeting">
+        <Card>
+          <p className="text-[11.5px] text-muted leading-relaxed mb-3">
+            Shown on the panel's home screen. Up to 32 characters.
+          </p>
+          <div className="flex gap-2">
+            <Input
+              value={draft}
+              maxLength={32}
+              placeholder="Owner"
+              aria-label="Panel greeting name"
+              onFocus={() => setEditingName(true)}
+              onChange={(e) => {
+                setEditingName(true);
+                setDraft(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveWelcome();
+              }}
+            />
+            <Button
+              size="md"
+              variant="secondary"
+              loading={busy === "welcome"}
+              disabled={!draft.trim() || draft.trim() === welcome}
+              onClick={saveWelcome}
+              aria-label="Save greeting"
+            >
+              <Check size={17} />
+            </Button>
+          </div>
+        </Card>
+      </Section>
 
       <MetricGrid>
         <MetricTile

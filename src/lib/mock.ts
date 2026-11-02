@@ -247,6 +247,7 @@ export const mock = {
             relay,
             state: relay === 0 || relay === 3,
           })),
+          welcome: "Mayur",
           bmp280: { valid: true, temp_c: 21.4, hpa: 1013.2 },
           hvac: {
             power: true,
