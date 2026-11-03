@@ -40,7 +40,7 @@ export function DeviceListScreen() {
     <div className="flex flex-col">
       {/* A quiet brand line, not a second heading competing with the greeting. */}
       <div className="flex items-center justify-between px-4 pt-4 pb-1">
-        <Logo height={22} />
+        <Logo height={26} />
         <button
           type="button"
           aria-label="Account"

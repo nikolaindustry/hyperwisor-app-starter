@@ -1,5 +1,31 @@
+import * as React from "react";
 import { appConfig } from "@config";
 import { cn } from "@/lib/utils";
+
+/**
+ * Which relief to use.
+ *
+ * The mark is moulded out of the surface -- it is light and shade only, with
+ * the letter face left transparent so the ground shows through. That is what
+ * makes it read as the surface deforming rather than a sticker on it, and it
+ * is also why there are two files: a highlight that works on #E9EBF0 is
+ * invisible on #1C1E22, and the shade that works on dark would be soot on
+ * light.
+ */
+function useReliefSrc(): string | null {
+  const base = appConfig.logoUrl;
+  const [dark, setDark] = React.useState(false);
+  React.useEffect(() => {
+    const read = () =>
+      setDark(document.documentElement.getAttribute("data-theme") === "dark");
+    read();
+    const mo = new MutationObserver(read);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => mo.disconnect();
+  }, []);
+  if (!base) return null;
+  return dark ? base.replace(/\.png$/, "-dark.png") : base;
+}
 
 /**
  * The brand mark.
@@ -7,12 +33,11 @@ import { cn } from "@/lib/utils";
  * Sized by HEIGHT, with the width left to the image. A wordmark is wide --
  * Chintamani's is roughly 5.5:1 -- so the old square `size` prop squashed it.
  *
- * `emboss` gives the mark the same depth as the rest of the soft UI. It is a
- * pair of drop-shadows rather than a box: drop-shadow follows the image's
- * alpha, so light and shade land on the letterforms themselves instead of on
- * a rectangle around them. The direction matches every other raised surface
- * -- light above-left, shade below-right -- because one element lit from
- * elsewhere is what makes a page stop reading as physical.
+ * The Chintamani mark is a RELIEF: light and shade only, with the letter
+ * face transparent so the ground shows through. That is what makes it read
+ * as the surface being moulded rather than an object placed on it -- a
+ * coloured logo cannot be neumorphic, because neumorphism needs the shape to
+ * be the same material as its background.
  *
  * Kept subtle on purpose: a logo carries the brand's own colour, and heavy
  * embossing muddies it.
@@ -32,21 +57,20 @@ export function Logo({
    * one: the shade lands outside strokes that are only two or three pixels
    * wide, so the emboss reads as a faint blur instead of relief. Tying them
    * to the height keeps the same apparent depth at any size. */
-  const u = height / 30;
-  /* One soft shadow, not the usual pair.
+  /* No CSS shadow at all.
    *
-   * The brand asset carries its own relief -- the letters are extruded, with
-   * a lit face and a dark side wall baked in -- so all that is left for CSS
-   * is the ambient shade that lifts the whole mark off the ground. Adding
-   * the usual white top-left rim on top of a baked highlight flattens the
-   * extrusion back into a smudge. */
-  const shadow = emboss
-    ? { filter: `drop-shadow(${1.1 * u}px ${1.5 * u}px ${1.8 * u}px var(--logo-shade))` }
-    : undefined;
+   * The asset is pure relief -- the four rims a moulded letterform shows,
+   * plus its ambient occlusion, with the face transparent. A drop-shadow on
+   * top would cast a second shadow from a shape that is already only
+   * shadow, which reads as a blur rather than more depth. `emboss` is kept
+   * so a caller can still opt out on a busy background. */
+  void emboss;
+
+  const src = useReliefSrc();
 
   // No asset configured: fall back to the initial on a raised plinth, so an
   // unbranded clone still looks deliberate rather than broken.
-  if (!appConfig.logoUrl) {
+  if (!src) {
     return (
       <div
         className={cn(
@@ -72,9 +96,9 @@ export function Logo({
   return (
     <span className={cn("block w-fit shrink-0", className)}>
       <img
-        src={appConfig.logoUrl}
+        src={src}
         alt={appConfig.appName}
-        style={{ height, width: "auto", ...shadow }}
+        style={{ height, width: "auto" }}
         className="block select-none max-w-full"
         draggable={false}
         onError={(e) => {
