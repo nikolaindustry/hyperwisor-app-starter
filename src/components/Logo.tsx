@@ -33,12 +33,15 @@ export function Logo({
    * wide, so the emboss reads as a faint blur instead of relief. Tying them
    * to the height keeps the same apparent depth at any size. */
   const u = height / 30;
+  /* One soft shadow, not the usual pair.
+   *
+   * The brand asset carries its own relief -- the letters are extruded, with
+   * a lit face and a dark side wall baked in -- so all that is left for CSS
+   * is the ambient shade that lifts the whole mark off the ground. Adding
+   * the usual white top-left rim on top of a baked highlight flattens the
+   * extrusion back into a smudge. */
   const shadow = emboss
-    ? {
-        filter:
-          `drop-shadow(${-0.9 * u}px ${-0.9 * u}px ${0.6 * u}px var(--logo-light)) ` +
-          `drop-shadow(${1.3 * u}px ${1.7 * u}px ${2.2 * u}px var(--logo-shade))`,
-      }
+    ? { filter: `drop-shadow(${1.1 * u}px ${1.5 * u}px ${1.8 * u}px var(--logo-shade))` }
     : undefined;
 
   // No asset configured: fall back to the initial on a raised plinth, so an
