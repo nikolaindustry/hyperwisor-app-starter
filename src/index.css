@@ -48,6 +48,10 @@
   --shadow-sm: var(--shadow-lift-sm);
   --shadow-md: var(--shadow-lift);
   --shadow-lg: var(--shadow-lift-lg);
+  /* Logo emboss. Tighter and harder than a surface shadow -- it has to read
+     on letterforms a couple of millimetres thick, not on a 60px card. */
+  --logo-light: rgba(255, 255, 255, 0.95);
+  --logo-shade: rgba(150, 156, 170, 0.6);
 }
 :root[data-theme="dark"] {
   --lift-light: rgba(255, 255, 255, 0.045);
@@ -62,6 +66,8 @@
   --shadow-sm: var(--shadow-lift-sm);
   --shadow-md: var(--shadow-lift);
   --shadow-lg: var(--shadow-lift-lg);
+  --logo-light: rgba(255, 255, 255, 0.10);
+  --logo-shade: rgba(0, 0, 0, 0.6);
 }
 
 * {

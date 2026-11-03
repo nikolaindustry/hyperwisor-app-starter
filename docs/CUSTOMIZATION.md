@@ -8,8 +8,8 @@ This guide walks through the rest.
 Edit `app.config.ts`:
 
 ```ts
-appName: "Acme Devices",
-bundleId: "com.acme.devices",  // change BEFORE first cap:add
+appName: "Chintamani",
+bundleId: "com.chintamani.app",  // change BEFORE first cap:add
 logoUrl: "/logo.svg",            // drop into public/, reference by path
 supportEmail: "support@acme.com",
 ```
@@ -97,3 +97,21 @@ investor / client walkthroughs before backend is live.
 
 Move credentials out of `app.config.ts` and into env or a proxy worker.
 See [`SECURITY.md`](./SECURITY.md).
+
+### If you change the bundle id after `cap add`
+
+Capacitor writes the Android identity once, when the platform is generated.
+Editing `bundleId` in app.config.ts and `appId` in capacitor.config.ts later
+does **not** rewrite it -- `cap sync` leaves it alone -- so the app keeps
+installing under the old id with the new branding inside, which is easy to
+miss because the build and install both succeed.
+
+Change it in `android/app/build.gradle` as well:
+
+```gradle
+applicationId "com.chintamani.app"
+```
+
+Leave `namespace` as it is unless you also move the Java sources: it names
+the generated `R`/`BuildConfig` package and must match the directory
+`cap add` created. Android is happy for the two to differ.

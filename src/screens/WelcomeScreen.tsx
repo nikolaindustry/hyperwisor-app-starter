@@ -9,7 +9,7 @@ export function WelcomeScreen() {
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-7">
         <div className="rounded-2xl p-px bg-gradient-to-b from-border to-transparent">
           <div className="rounded-2xl bg-card p-5 shadow-sm">
-            <Logo size={64} />
+            <Logo height={44} />
           </div>
         </div>
         <div className="space-y-2">

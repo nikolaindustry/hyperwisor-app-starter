@@ -22,10 +22,10 @@ export const appConfig = {
   // bike trackers as readily as thermostats, so its own defaults should not
   // make every fresh clone look like a smart-home app before the
   // manufacturer has changed a thing.
-  appName: "Acme Devices",
-  bundleId: "com.acme.devices",
-  logoUrl: "/logo.svg",
-  supportEmail: "support@acme.com",
+  appName: "Chintamani",
+  bundleId: "com.chintamani.app",
+  logoUrl: "/brand-logo.png",
+  supportEmail: "support@chintamani.in",
   version: "0.1.0",
 
   // --- Mode -------------------------------------------------------
@@ -80,9 +80,13 @@ export const appConfig = {
     // ground the old #71717A grey falls to 3.5:1 and #16A34A to 2.7:1, both
     // below WCAG AA. Fills stay bright; only text shades moved.
     light: {
-      primary: "#2563EB",
+      // Chintamani red, darkened for interface use. The logo's own #FF0103
+      // stays untouched in the artwork; as a UI colour it measures 3.3:1 on
+      // this ground and 4.0:1 behind white text, both under WCAG AA.
+      // #C1121F is 4.9:1 and 5.7:1 respectively, and reads as the same red.
+      primary: "#C1121F",
       primaryForeground: "#FFFFFF",
-      accent: "#0F766E",
+      accent: "#7A1420",
       background: "#E9EBF0", // the ground
       card: "#E9EBF0", // same as the ground, on purpose
       surface: "#DFE2E9", // recessed wells
@@ -96,9 +100,9 @@ export const appConfig = {
     // for a light edge either. This is a visible change on OLED -- a near
     // black ground cannot do soft UI, so it is a trade, not an oversight.
     dark: {
-      primary: "#3B82F6",
-      primaryForeground: "#FFFFFF",
-      accent: "#2DD4BF",
+      primary: "#F2555F",
+      primaryForeground: "#1A0608",
+      accent: "#FF8A93",
       background: "#1C1E22",
       card: "#1C1E22",
       surface: "#17191C",

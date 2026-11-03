@@ -35,7 +35,7 @@ export function AuthShell({
       </div>
 
       <div className="flex-1 flex flex-col px-6 pt-4">
-        <Logo size={44} />
+        <Logo height={30} />
         <h1 className="text-[26px] font-semibold tracking-tight mt-5">
           {title}
         </h1>

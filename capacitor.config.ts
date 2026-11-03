@@ -14,8 +14,8 @@ import type { CapacitorConfig } from "@capacitor/cli";
  * here too. Two lines, once, at setup.
  */
 const config: CapacitorConfig = {
-  appId: "com.acme.devices",
-  appName: "Acme Devices",
+  appId: "com.chintamani.app",
+  appName: "Chintamani",
   webDir: "dist",
   server: {
     androidScheme: "https",
@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
   plugins: {
     SplashScreen: {
       launchShowDuration: 1500,
-      backgroundColor: "#FBFBFC",
+      backgroundColor: "#E9EBF0",   /* the soft-UI ground */
     },
     BarcodeScanner: {
       cameraDirection: "back",

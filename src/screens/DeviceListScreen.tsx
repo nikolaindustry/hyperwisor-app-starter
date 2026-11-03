@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Plus, PackagePlus, User } from "lucide-react";
 import { useDevices } from "@/hooks/useDevices";
+import { Logo } from "@/components/Logo";
 import { useAuth } from "@/auth/AuthProvider";
 import { DeviceCard } from "@/components/DeviceCard";
 import { Button } from "@/components/ui/Button";
@@ -39,9 +40,7 @@ export function DeviceListScreen() {
     <div className="flex flex-col">
       {/* A quiet brand line, not a second heading competing with the greeting. */}
       <div className="flex items-center justify-between px-4 pt-4 pb-1">
-        <span className="text-[13px] font-semibold text-muted truncate">
-          {appConfig.appName}
-        </span>
+        <Logo height={22} />
         <button
           type="button"
           aria-label="Account"
