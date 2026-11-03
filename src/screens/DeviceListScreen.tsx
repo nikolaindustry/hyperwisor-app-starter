@@ -40,16 +40,32 @@ export function DeviceListScreen() {
     <div className="flex flex-col">
       {/* A quiet brand line, not a second heading competing with the greeting. */}
       <div className="flex items-center justify-between px-4 pt-4 pb-1">
-        <Logo height={26} />
-        <button
-          type="button"
-          aria-label="Account"
-          onClick={() => navigate("/account")}
-          className="w-9 h-9 rounded-md bg-card shadow-lift-sm active:shadow-press-sm
-                     flex items-center justify-center shrink-0 transition-shadow"
-        >
-          <User size={17} />
-        </button>
+        <Logo height={34} />
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Adding a device is a corner action once you have one. The
+              full-width tile below is for an empty account, where it is the
+              only thing to do. */}
+          {count > 0 ? (
+            <button
+              type="button"
+              aria-label="Add a device"
+              onClick={() => navigate("/add")}
+              className="w-9 h-9 rounded-md bg-card shadow-lift-sm active:shadow-press-sm
+                         flex items-center justify-center transition-shadow"
+            >
+              <Plus size={17} className="text-primary" />
+            </button>
+          ) : null}
+          <button
+            type="button"
+            aria-label="Account"
+            onClick={() => navigate("/account")}
+            className="w-9 h-9 rounded-md bg-card shadow-lift-sm active:shadow-press-sm
+                       flex items-center justify-center transition-shadow"
+          >
+            <User size={17} />
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 px-4 pt-4 flex flex-col gap-5">
@@ -102,19 +118,6 @@ export function DeviceListScreen() {
                 ))}
               </div>
             )}
-
-            {/* Closes the grid, so adding the next device is a place on the
-                page rather than a button hidden in the header. */}
-            <Link
-              to="/add"
-              className="rounded-lg shadow-press-sm px-4 py-5 flex flex-col items-center
-                         justify-center gap-2.5 text-muted min-h-[112px]"
-            >
-              <span className="w-10 h-10 rounded-md bg-card shadow-lift-sm flex items-center justify-center">
-                <Plus size={18} className="text-primary" />
-              </span>
-              <span className="text-[12.5px] font-medium">Add a device</span>
-            </Link>
           </>
         )}
       </div>
