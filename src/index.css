@@ -99,37 +99,6 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Leather grain.
- *
- * One fixed overlay rather than a background-image on `body`, because a
- * card uses the SAME colour as the ground -- that is what makes soft UI
- * work -- so a textured body would show every card as a smooth patch on a
- * grained field. Laid over the top, the grain crosses panels and ground
- * alike and the surface reads as one piece of hide.
- *
- * soft-light, not overlay or multiply: it modulates whatever is beneath
- * without changing its hue, so a single grey tile serves both themes.
- *
- * Deliberately faint. Soft UI needs an even ground for its paired shadows
- * to read; a punchy texture eats them and the depth goes flat.
- */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 60;
-  background-image: url("/leather.png");
-  background-repeat: repeat;
-  background-size: 256px 256px;   /* ~7px pebbles on a phone */
-  mix-blend-mode: soft-light;
-  opacity: 0.9;
-}
-:root[data-theme="dark"] body::after {
-  /* Dark needs less: soft-light lifts more on a dark ground. */
-  opacity: 0.6;
-}
-
 input,
 button,
 textarea,
